@@ -3,9 +3,13 @@ import { Replace } from './../../helpers/Replace';
 import { randomUUID } from 'node:crypto';
 import * as bcrypt from 'bcrypt';
 
+type Role = 'ADMIN' | 'USER';
+
 export interface UserProps {
+  name: string;
   email: string;
   password?: string;
+  role: Role;
   createdAt: Date;
 }
 
@@ -13,8 +17,8 @@ export class User {
   private _id: string;
   private props: UserProps;
 
-  constructor(props: Replace<UserProps, { createdAt?: Date }>) {
-    this._id = randomUUID();
+  constructor(props: Replace<UserProps, { createdAt?: Date }>, id?: string) {
+    this._id = id ?? randomUUID();
     this.props = {
       ...props,
       createdAt: props.createdAt ?? new Date(),
@@ -23,6 +27,14 @@ export class User {
 
   public get id(): string {
     return this._id;
+  }
+
+  public get name(): string {
+    return this.props.name;
+  }
+
+  public set name(name: string) {
+    this.props.name = name;
   }
 
   public get email(): string {
@@ -39,6 +51,14 @@ export class User {
 
   public set password(password: string) {
     this.props.password = password;
+  }
+
+  public get role(): Role {
+    return this.props.role;
+  }
+
+  public set role(role: Role) {
+    this.props.role = role;
   }
 
   public get createdAt(): Date {

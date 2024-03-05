@@ -13,8 +13,10 @@ describe('Create User', () => {
 
   it('should be able create a new user', async () => {
     const newUser = new User({
+      name: 'user-test',
       email: 'email@test.com',
       password: '123',
+      role: 'USER',
       createdAt: new Date(),
     });
 

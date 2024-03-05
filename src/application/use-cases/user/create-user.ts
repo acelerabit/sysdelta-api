@@ -4,7 +4,9 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 interface UserRequest {
+  name: string;
   email: string;
+  role: 'ADMIN' | 'USER';
   password: string;
 }
 
@@ -17,12 +19,14 @@ export class CreateUser {
   constructor(private usersRepository: UsersRepository) {}
 
   async execute(request: UserRequest): Promise<UserResponse> {
-    const { email, password } = request;
+    const { email, password, name, role } = request;
 
     const hashedPassword = await this.hashPassword(password);
 
     const user = new User({
+      name,
       email,
+      role,
       password: hashedPassword,
       createdAt: new Date(),
     });

@@ -3,14 +3,14 @@ version: '3.7'
 services:
   database:
     image: postgres
-    container_name: test
+    container_name: setup
     restart: always
     ports:
-      - 5432:5432
+      - 5442:5432
     environment:
       - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=test_docker
-      - POSTGRES_DB=test_docker
+      - POSTGRES_PASSWORD=setup_docker
+      - POSTGRES_DB=setup_docker
     volumes:
       - pgdata:/data/postgres
 
