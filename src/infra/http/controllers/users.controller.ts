@@ -1,10 +1,15 @@
 import { CreateUser } from './../../../application/use-cases/user/create-user';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CreateUserBody } from '../dtos/create-user-body';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Controller('users')
 export class UsersController {
-  constructor(private createUser: CreateUser) {}
+  constructor(
+    private createUser: CreateUser,
+    @InjectQueue('sendMail-queue') private sendMailQueue: Queue,
+  ) {}
 
   @Post()
   async create(@Body() body: CreateUserBody) {
@@ -18,5 +23,12 @@ export class UsersController {
     });
 
     return { user };
+  }
+
+  @Get()
+  async sendMail() {
+    await this.sendMailQueue.add('sendMail-job', { email: 'teste@gmail.com' });
+
+    return;
   }
 }
