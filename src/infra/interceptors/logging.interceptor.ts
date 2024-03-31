@@ -23,6 +23,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
+
     const { method, url, body, params } = req;
     const startTime = Date.now();
 
@@ -40,17 +41,21 @@ export class LoggingInterceptor implements NestInterceptor {
       tap((data) => {
         const endTime = Date.now();
         const executionTime = endTime - startTime;
+
+        const copiedData = JSON.parse(JSON.stringify(data));
         // Aqui você pode guardar os dados de entrada, resposta e qualquer outro dado relevante em um serviço de log
         this.loggingService.logRequest(
           method,
           url,
           body,
           params,
-          data,
+          copiedData,
           executionTime,
           this.fieldsToHide,
           decoded?.id ?? null,
         );
+
+        return data;
       }),
 
       catchError((error) => {

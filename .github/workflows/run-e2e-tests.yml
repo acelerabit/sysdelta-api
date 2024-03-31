@@ -36,5 +36,6 @@ jobs:
       env:
         DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_database
         REDIS_URL: redis://@localhost:6379
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       run: yarn test:e2e

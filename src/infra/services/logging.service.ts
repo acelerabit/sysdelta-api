@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { stringify } from 'querystring';
 
 @Injectable()
 export class LoggingService {
@@ -19,9 +20,12 @@ export class LoggingService {
     userId?: string | null,
   ) {
     // Ocultando campos do corpo da solicitação e da resposta
-    const hiddenRequestBody = this.hideFields({ ...requestBody }, fieldsToHide);
+    const hiddenRequestBody = this.hideFields(
+      { ...JSON.parse(JSON.stringify(requestBody)) },
+      fieldsToHide,
+    );
     const hiddenResponseBody = this.hideFields(
-      { ...responseBody },
+      { ...JSON.parse(JSON.stringify(responseBody)) },
       fieldsToHide,
     );
 
