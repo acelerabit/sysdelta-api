@@ -3,7 +3,7 @@ name: End-to-End Tests
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   e2e_tests:
