@@ -1,7 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
-import { Replace } from './../../helpers/Replace';
 import { randomUUID } from 'node:crypto';
-import * as bcrypt from 'bcrypt';
+import { Replace } from './../../helpers/Replace';
 
 type Role = 'ADMIN' | 'USER';
 
@@ -63,5 +61,11 @@ export class User {
 
   public get createdAt(): Date {
     return this.props.createdAt;
+  }
+
+  static create(props: Replace<UserProps, { createdAt?: Date }>, id?: string) {
+    const user = new User(props, id);
+
+    return user;
   }
 }

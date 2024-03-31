@@ -1,15 +1,19 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
-import { UsersController } from './controllers/users.controller';
 import { CreateUser } from 'src/application/use-cases/user/create-user';
-import { AuthController } from './controllers/auth.controller';
 import { LoginUser } from 'src/application/use-cases/authenticate/login-user';
 import { JwtService } from '@nestjs/jwt';
 import { EmailModule } from '../email/email.module';
+import { FetchAllLogs } from 'src/application/use-cases/logs/fetch-all-logs';
+import { LogsController } from './controllers/logs/logs.controller';
+import { AuthController } from './controllers/auth/auth.controller';
+import { UsersController } from './controllers/users/users.controller';
+import { CryptographyModule } from '../cryptography/cryptography.module';
+import { UpdateUser } from '@/application/use-cases/user/update-user';
 
 @Module({
-  controllers: [UsersController, AuthController],
-  providers: [CreateUser, LoginUser, JwtService],
-  imports: [DatabaseModule, EmailModule],
+  controllers: [UsersController, AuthController, LogsController],
+  providers: [CreateUser, LoginUser, FetchAllLogs, UpdateUser, JwtService],
+  imports: [DatabaseModule, EmailModule, CryptographyModule],
 })
 export class HttpModule {}

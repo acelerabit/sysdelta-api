@@ -1,7 +1,7 @@
+import { HashGenerator } from '@/application/cryptography/hash-generator';
+import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../repositories/user-repository';
 import { User } from './../../entities/user';
-import { Injectable, BadRequestException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 
 interface UserRequest {
   name: string;
@@ -16,14 +16,17 @@ interface UserResponse {
 
 @Injectable()
 export class CreateUser {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private hashGenerator: HashGenerator,
+  ) {}
 
   async execute(request: UserRequest): Promise<UserResponse> {
     const { email, password, name, role } = request;
 
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await this.hashGenerator.hash(password);
 
-    const user = new User({
+    const user = User.create({
       name,
       email,
       role,
@@ -34,12 +37,5 @@ export class CreateUser {
     await this.usersRepository.create(user);
 
     return { user };
-  }
-
-  private async hashPassword(password: string) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    return hashedPassword;
   }
 }

@@ -5,6 +5,8 @@ import { User } from './../../entities/user';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
+import { HashCompare } from '@/application/cryptography/hash-comparer';
+import { Encrypter } from '@/application/cryptography/encrypter';
 
 interface LoginRequest {
   email: string;
@@ -20,6 +22,8 @@ interface LoginResponse {
 export class LoginUser {
   constructor(
     private usersRepository: UsersRepository,
+    private hashComparer: HashCompare,
+    private encrypter: Encrypter,
     private jwt: JwtService,
   ) {}
 
@@ -29,16 +33,16 @@ export class LoginUser {
     const user = await this.usersRepository.findByEmail(email);
 
     if (user) {
-      const passwordMatch = await this.comparePasswords({
-        password,
-        hashedPassword: user.password,
-      });
+      const passwordMatch = this.hashComparer.compare(password, user.password);
 
       if (!passwordMatch) {
         throw new BadRequestException('Usuário ou senha inválida!');
       }
 
-      const token = await this.signToken({ id: user.id, email: user.email });
+      const token = await this.encrypter.encrypt({
+        id: user.id,
+        email: user.email,
+      });
 
       if (!token) {
         throw new BadRequestException('Usuário ou senha inválida!');
