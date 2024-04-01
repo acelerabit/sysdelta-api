@@ -26,9 +26,9 @@ beforeAll(async () => {
   process.env.DATABASE_URL = databaseURL;
 
   try {
-    execSync('yarn prisma migrate reset');
+    execSync('npx prisma migrate reset --force', { stdio: 'inherit' });
+
     execSync('yarn prisma migrate deploy');
-    execSync('yarn prisma db push');
   } catch (err) {
     console.log('erro migrations');
   }
