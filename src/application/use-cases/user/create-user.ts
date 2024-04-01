@@ -1,5 +1,5 @@
 import { HashGenerator } from '@/application/cryptography/hash-generator';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../repositories/user-repository';
 import { User } from './../../entities/user';
 
@@ -23,6 +23,15 @@ export class CreateUser {
 
   async execute(request: UserRequest): Promise<UserResponse> {
     const { email, password, name, role } = request;
+
+    const userWithSameEmail = await this.usersRepository.findByEmail(email);
+
+    if (userWithSameEmail) {
+      throw new BadRequestException(`Usuário com email ${email} já existe`, {
+        cause: new Error(`Usuário com email ${email} já existe`),
+        description: `Usuário com email ${email} já existe`,
+      });
+    }
 
     const hashedPassword = await this.hashGenerator.hash(password);
 

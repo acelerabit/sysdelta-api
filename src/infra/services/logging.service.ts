@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
-import { stringify } from 'querystring';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class LoggingService {
-  private prisma: PrismaService;
+  private prisma: PrismaClient;
   constructor() {
-    this.prisma = new PrismaService();
+    this.prisma = new PrismaClient();
   }
 
   async logRequest(

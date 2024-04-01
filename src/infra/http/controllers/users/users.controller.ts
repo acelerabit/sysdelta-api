@@ -47,6 +47,7 @@ export class UsersController {
       email: user.email,
       name: user.name,
       role: user.role,
+      id: user.id,
     };
   }
 
