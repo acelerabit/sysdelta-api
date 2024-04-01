@@ -30,6 +30,7 @@ export class LoggingService {
     );
 
     try {
+      console.log('salvando log');
       await this.prisma.log.create({
         data: {
           data: {
