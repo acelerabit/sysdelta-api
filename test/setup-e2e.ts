@@ -27,7 +27,7 @@ beforeAll(async () => {
 
   try {
     execSync('yarn prisma migrate reset --force', { stdio: 'inherit' });
-
+    execSync('yarn prisma generate');
     execSync('yarn prisma migrate deploy');
   } catch (err) {
     console.log('erro migrations');
