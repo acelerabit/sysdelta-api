@@ -33,5 +33,5 @@ model Log {
 
   data Json
 
-  @@map("loggings")
+  @@map("log")
 }
