@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=setup_docker
       - POSTGRES_DB=setup_docker
     volumes:
-      - pgdata:/data/postgres
+      - ./data/pg:/data/postgres
   redis:
     container_name: setup-redis
     image: redis:alpine

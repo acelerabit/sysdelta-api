@@ -25,7 +25,11 @@ beforeAll(async () => {
 
   process.env.DATABASE_URL = databaseURL;
 
-  execSync('yarn prisma migrate deploy');
+  try {
+    execSync('npx prisma migrate deploy');
+  } catch (err) {
+    console.log('erro migrations');
+  }
 });
 
 afterAll(async () => {

@@ -10,10 +10,18 @@ import { AuthController } from './controllers/auth/auth.controller';
 import { UsersController } from './controllers/users/users.controller';
 import { CryptographyModule } from '../cryptography/cryptography.module';
 import { UpdateUser } from '@/application/use-cases/user/update-user';
+import { LoggingService } from '../services/logging.service';
 
 @Module({
   controllers: [UsersController, AuthController, LogsController],
-  providers: [CreateUser, LoginUser, FetchAllLogs, UpdateUser, JwtService],
+  providers: [
+    CreateUser,
+    LoginUser,
+    FetchAllLogs,
+    UpdateUser,
+    JwtService,
+    LoggingService,
+  ],
   imports: [DatabaseModule, EmailModule, CryptographyModule],
 })
 export class HttpModule {}

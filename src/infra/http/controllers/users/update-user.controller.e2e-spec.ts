@@ -1,5 +1,6 @@
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
+import { LoggingService } from '@/infra/services/logging.service';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { hash } from 'bcrypt';
@@ -13,6 +14,7 @@ describe('Update user (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
+      providers: [LoggingService, PrismaService],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -44,8 +46,6 @@ describe('Update user (E2E)', () => {
         email: 'johndoe-updated@gmail.com',
       },
     });
-
-    console.log(userOnDatabase);
 
     expect(userOnDatabase).toBeTruthy();
   });

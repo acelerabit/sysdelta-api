@@ -29,20 +29,24 @@ export class LoggingService {
       fieldsToHide,
     );
 
-    await this.prisma.log.create({
-      data: {
+    try {
+      await this.prisma.log.create({
         data: {
-          userId,
-          method,
-          url,
-          requestBody: hiddenRequestBody,
-          params,
-          responseBody: hiddenResponseBody,
-          executionTime,
-          tag: 'controller',
+          data: {
+            userId,
+            method,
+            url,
+            requestBody: hiddenRequestBody,
+            params,
+            responseBody: hiddenResponseBody,
+            executionTime,
+            tag: 'controller',
+          },
         },
-      },
-    });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async logError(

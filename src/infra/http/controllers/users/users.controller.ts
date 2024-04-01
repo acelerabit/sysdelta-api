@@ -31,6 +31,7 @@ export class UsersController {
     @InjectQueue('sendMail-queue') private sendMailQueue: Queue,
   ) {}
 
+  @UseInterceptors(interceptor)
   @Post()
   async create(@Body() body: CreateUserBody) {
     const { email, password, role, name } = body;
