@@ -1,37 +1,32 @@
-import { InjectQueue } from '@nestjs/bull';
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
-import { Queue } from 'bull';
-import { LoggingInterceptor } from 'src/infra/interceptors/logging.interceptor';
-import { LoggingService } from 'src/infra/services/logging.service';
-import { JwtUserAuthGuard } from 'src/infra/auth/jwt.guard';
-import { CreateUser } from 'src/application/use-cases/user/create-user';
-import { CreateUserBody } from './dtos/create-user-body';
 import { UpdateUser } from '@/application/use-cases/user/update-user';
+import { EMAIL_QUEUE } from '@/common/constants';
+import { InjectQueue } from '@nestjs/bull';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { Queue } from 'bull';
+import { CreateUser } from 'src/application/use-cases/user/create-user';
+import { JwtUserAuthGuard } from 'src/infra/auth/jwt.guard';
+import { CreateUserBody } from './dtos/create-user-body';
 import { UpdateUserBody } from './dtos/update-user-body';
+import { ScheduleService } from '@/infra/schedules/schedules.service';
 
-const interceptor = new LoggingInterceptor(new LoggingService(), [
-  'password',
-  'access_token',
-  'user.email',
-]);
+/** If you want catch data from requests and responses, enable it */
+
+// const interceptor = new LoggingInterceptor(new LoggingService(), [
+//   'password',
+//   'access_token',
+//   'user.email',
+// ]);
 
 @Controller('users')
 export class UsersController {
   constructor(
     private createUser: CreateUser,
     private updateUser: UpdateUser,
-    @InjectQueue('sendMail-queue') private sendMailQueue: Queue,
+    private scheduleService: ScheduleService,
+    @InjectQueue(EMAIL_QUEUE) private sendMailQueue: Queue,
   ) {}
 
-  @UseInterceptors(interceptor)
+  // @UseInterceptors(interceptor)
   @Post()
   async create(@Body() body: CreateUserBody) {
     const { email, password, role, name } = body;
@@ -71,7 +66,6 @@ export class UsersController {
   }
 
   @UseGuards(JwtUserAuthGuard)
-  @UseInterceptors(interceptor)
   @Get('/send-email')
   async sendMail() {
     await this.sendMailQueue.add('sendMail-job', { email: 'teste@gmail.com' });

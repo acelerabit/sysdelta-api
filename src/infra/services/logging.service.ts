@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../database/prisma/prisma.service';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class LoggingService {
@@ -30,7 +29,6 @@ export class LoggingService {
     );
 
     try {
-      console.log('salvando log');
       await this.prisma.log.create({
         data: {
           data: {

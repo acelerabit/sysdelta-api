@@ -5,6 +5,8 @@ import { PrismaUsersRepository } from './prisma/repositiores/prisma-user-reposit
 import { prismaExtensionFactory } from './prisma/prisma-extension';
 import { LogsRepository } from 'src/application/repositories/logs-repository';
 import { PrismaLogsRepository } from './prisma/repositiores/prisma-logs-repository';
+import { NotificationRepository } from '@/application/repositories/notification-repository';
+import { PrismaNotificationsRepository } from './prisma/repositiores/prisma-notifications-repository';
 
 @Module({
   providers: [
@@ -15,6 +17,10 @@ import { PrismaLogsRepository } from './prisma/repositiores/prisma-logs-reposito
     {
       provide: LogsRepository,
       useClass: PrismaLogsRepository,
+    },
+    {
+      provide: NotificationRepository,
+      useClass: PrismaNotificationsRepository,
     },
     {
       provide: PrismaService,
@@ -31,6 +37,10 @@ import { PrismaLogsRepository } from './prisma/repositiores/prisma-logs-reposito
     {
       provide: LogsRepository,
       useClass: PrismaLogsRepository,
+    },
+    {
+      provide: NotificationRepository,
+      useClass: PrismaNotificationsRepository,
     },
     {
       provide: PrismaService,

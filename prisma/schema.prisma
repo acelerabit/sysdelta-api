@@ -24,8 +24,26 @@ model User {
 
   role Role @default(USER)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  message String
+  read    Boolean @default(false)
+
+  user User? @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String?  @map("user_id")
+
+  @@map("notifications")
 }
 
 model Log {
@@ -33,5 +51,5 @@ model Log {
 
   data Json
 
-  @@map("log")
+  @@map("logs")
 }

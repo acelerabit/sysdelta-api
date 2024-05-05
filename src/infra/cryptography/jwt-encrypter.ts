@@ -9,10 +9,19 @@ export class JwtEncrypter implements Encrypter {
 
   constructor(private jwtService: JwtService) {}
 
-  encrypt(payload: { id: string; email: string }): Promise<string> {
+  encrypt(
+    payload: { id: string; email: string },
+    expiresIn = this.EXPIRES_IN,
+  ): Promise<string> {
     return this.jwtService.signAsync(payload, {
       secret: jwtSecret,
-      expiresIn: this.EXPIRES_IN,
+      expiresIn: expiresIn,
+    });
+  }
+
+  decode(token: string): Promise<any> {
+    return this.jwtService.verify(token, {
+      secret: jwtSecret,
     });
   }
 }

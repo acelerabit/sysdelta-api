@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import 'dotenv/config';
 import { resolve } from 'node:path';
 import { SendMailConsumer } from '../jobs/send-email.consumer';
+import { EMAIL_QUEUE } from '@/common/constants';
 
 const url = new URL(process.env.REDIS_URL);
 
@@ -18,7 +19,7 @@ const url = new URL(process.env.REDIS_URL);
       },
     }),
     BullModule.registerQueue({
-      name: 'sendMail-queue',
+      name: EMAIL_QUEUE,
     }),
     MailerModule.forRoot({
       transport: {

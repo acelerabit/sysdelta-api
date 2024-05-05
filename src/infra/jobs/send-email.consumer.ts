@@ -1,10 +1,11 @@
+import { EMAIL_QUEUE } from '@/common/constants';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
 import 'dotenv/config';
 
-@Processor('sendMail-queue')
+@Processor(EMAIL_QUEUE)
 class SendMailConsumer {
   constructor(private mailService: MailerService) {}
 

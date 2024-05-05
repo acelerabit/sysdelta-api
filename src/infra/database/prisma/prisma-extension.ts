@@ -12,17 +12,18 @@ export const prismaExtensionFactory = (
         /* your custom logic for modifying all Prisma Client operations here */
 
         if (operationsWatched.includes(operation) && model !== 'Log') {
-          await client.log.create({
-            data: {
-              data: {
-                model,
-                operation,
-                args,
-                query: JSON.stringify(query),
-                tag: 'db',
-              },
-            },
-          });
+          /** if you want registry all operations in db, enable it */
+          // await client.log.create({
+          //   data: {
+          //     data: {
+          //       model,
+          //       operation,
+          //       args,
+          //       query: JSON.stringify(query),
+          //       tag: 'db',
+          //     },
+          //   },
+          // });
         }
 
         return query(args);
