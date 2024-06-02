@@ -39,10 +39,10 @@ export class SendForgotEmail {
     const expiresIn = '5m';
     const token = await this.encrypter.encrypt({ email }, expiresIn);
 
-    await this.sendMailQueue.add('send-mail-job', {
+    await this.sendMailQueue.add('sendMail-job', {
       email: email,
       subject: 'Recuperação de Senha: Clique aqui para redefinir sua senha',
-      text: `Olá,\n Você solicitou recentemente a redefinição de sua senha. Para continuar, clique no link abaixo:\n\n\n ${process.env.FRONTEND_URL}/forgot-password/redefine?token=${token}
+      text: `Olá,\n Você solicitou recentemente a redefinição de sua senha. Para continuar, clique no link abaixo:\n\n\n ${process.env.FRONTEND_URL}/recovery-password/redefine?token=${token}
     \n
     `,
     });

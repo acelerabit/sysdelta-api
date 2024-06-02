@@ -15,4 +15,8 @@ export class UpdateUserBody {
   @IsOptional()
   @IsNotEmpty()
   role: 'USER' | 'ADMIN';
+
+  @IsOptional()
+  @IsNotEmpty()
+  acceptNotifications: boolean;
 }

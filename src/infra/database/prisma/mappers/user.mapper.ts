@@ -9,6 +9,10 @@ export class PrismaUsersMapper {
         name: user.name,
         role: user.role,
         password: user.password,
+        avatarUrl: user.avatarUrl,
+        acceptNotifications: user.acceptNotifications,
+        externalId: user.externalId,
+        createdAt: user.createdAt,
       },
       user.id,
     );
@@ -21,6 +25,10 @@ export class PrismaUsersMapper {
       password: user.password,
       id: user.id,
       role: user.role,
+      avatarUrl: user.avatarUrl,
+      acceptNotifications: user.acceptNotifications,
+      externalId: user.externalId,
+      createdAt: user.createdAt,
     };
   }
 }

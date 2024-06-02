@@ -33,7 +33,10 @@ export class LoginUser {
     const user = await this.usersRepository.findByEmail(email);
 
     if (user) {
-      const passwordMatch = this.hashComparer.compare(password, user.password);
+      const passwordMatch = await this.hashComparer.compare(
+        password,
+        user.password,
+      );
 
       if (!passwordMatch) {
         throw new BadRequestException('Usuário ou senha inválida!');

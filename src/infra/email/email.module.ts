@@ -4,8 +4,9 @@ import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
 import { resolve } from 'node:path';
-import { SendMailConsumer } from '../jobs/send-email.consumer';
 import { EMAIL_QUEUE } from '@/common/constants';
+import { SendMailConsumerSendGrid } from '../jobs/send-mail-sendgrid.consumer';
+import { SendGridClient } from './sendgrid/send-grid.client';
 
 const url = new URL(process.env.REDIS_URL);
 
@@ -50,7 +51,7 @@ const url = new URL(process.env.REDIS_URL);
       },
     }),
   ],
-  providers: [SendMailConsumer],
+  providers: [SendMailConsumerSendGrid, SendGridClient],
   exports: [BullModule, MailerModule],
 })
 export class EmailModule {}

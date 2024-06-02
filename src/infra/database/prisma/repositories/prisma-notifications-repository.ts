@@ -70,4 +70,17 @@ export class PrismaNotificationsRepository implements NotificationRepository {
 
     return;
   }
+
+  async readAll(userId: string): Promise<void> {
+    await this.prismaService.notification.updateMany({
+      where: {
+        userId,
+      },
+      data: {
+        read: true,
+      },
+    });
+
+    return;
+  }
 }

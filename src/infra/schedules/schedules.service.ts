@@ -1,5 +1,3 @@
-// schedule.service.ts
-
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, Interval, Timeout, SchedulerRegistry } from '@nestjs/schedule';
 
@@ -22,8 +20,8 @@ export class ScheduleService {
   // }
 
   // Método para executar uma tarefa após um intervalo de tempo especificado
-  @Timeout(5000)
-  handleTimeout() {
-    this.logger.debug('Executing task after 5 seconds');
-  }
+  // @Timeout(5000)
+  // handleTimeout() {
+  //   this.logger.debug('Executing task after 5 seconds');
+  // }
 }

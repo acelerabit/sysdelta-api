@@ -18,6 +18,8 @@ export class PrismaUsersRepository implements UsersRepository {
         password: user.password,
         createdAt: user.createdAt,
         role: user.role,
+        acceptNotifications: user.acceptNotifications,
+        externalId: user.externalId,
       },
     });
   }
@@ -26,6 +28,9 @@ export class PrismaUsersRepository implements UsersRepository {
     const raw = await this.prismaService.user.findUnique({
       where: {
         email,
+      },
+      include: {
+        subscription: true,
       },
     });
 
@@ -48,10 +53,19 @@ export class PrismaUsersRepository implements UsersRepository {
     return users.map(PrismaUsersMapper.toDomain);
   }
 
+  async findAllWithoutPaginate(): Promise<User[]> {
+    const users = await this.prismaService.user.findMany();
+
+    return users.map(PrismaUsersMapper.toDomain);
+  }
+
   async findById(id: string): Promise<User> {
     const raw = await this.prismaService.user.findUnique({
       where: {
         id,
+      },
+      include: {
+        subscription: true,
       },
     });
 
@@ -71,5 +85,11 @@ export class PrismaUsersRepository implements UsersRepository {
       },
       data: prismaUser,
     });
+  }
+
+  async count(): Promise<number> {
+    const count = await this.prismaService.user.count();
+
+    return count;
   }
 }

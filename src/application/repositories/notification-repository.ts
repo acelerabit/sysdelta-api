@@ -6,4 +6,5 @@ export abstract class NotificationRepository {
   abstract fetchAll(userId: string): Promise<Notification[]>;
   abstract fetchAllUnread(userId: string): Promise<Notification[]>;
   abstract read(id: string): Promise<void>;
+  abstract readAll(userId: string): Promise<void>;
 }

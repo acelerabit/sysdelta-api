@@ -18,7 +18,7 @@ export class GetUser {
     const user = await this.usersRepository.findById(id);
 
     if (!user) {
-      throw new BadRequestException('Não foi possivel editar o usuário', {
+      throw new BadRequestException('Não foi possivel buscar o usuário', {
         cause: new Error('Usuário não encontrado'),
         description: 'Usuário não encontrado',
       });

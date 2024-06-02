@@ -1,23 +1,35 @@
 import {
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @WebSocketGateway({ cors: true })
-export class WebsocketService implements OnGatewayConnection {
+export class WebsocketsGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+  private clients: Set<Socket> = new Set();
+
   constructor(private prismaService: PrismaService) {}
 
-  handleConnection() {
-    // console.log(client.handshake.auth.userId);
+  afterInit(server: Server) {
+    console.log('WebSocket Gateway initialized');
   }
 
-  afterInit() {
-    console.log('Initialized');
+  handleConnection(client: Socket) {
+    // console.log(`Client connected: ${client.id}`);
+    this.clients.add(client);
+  }
+
+  handleDisconnect(client: Socket) {
+    // console.log(`Client disconnected: ${client.id}`);
+    this.clients.delete(client);
   }
 
   @WebSocketServer()

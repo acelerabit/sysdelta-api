@@ -2,6 +2,7 @@ import { HashGenerator } from '@/application/cryptography/hash-generator';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../repositories/user-repository';
 import { User } from './../../entities/user';
+import { BillingService } from '@/infra/billing/billing.service';
 
 interface UserRequest {
   name: string;
@@ -19,6 +20,7 @@ export class CreateUser {
   constructor(
     private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
+    private billingService: BillingService,
   ) {}
 
   async execute(request: UserRequest): Promise<UserResponse> {
@@ -42,6 +44,13 @@ export class CreateUser {
       password: hashedPassword,
       createdAt: new Date(),
     });
+
+    const customer = await this.billingService.createCustomer({
+      name: user.name,
+      email: user.email,
+    });
+
+    user.externalId = customer.id;
 
     await this.usersRepository.create(user);
 
