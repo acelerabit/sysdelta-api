@@ -25,9 +25,6 @@ describe('Active Plan usecase', () => {
       value: 1000,
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);

@@ -26,8 +26,8 @@ export class GetUserSubscription {
       throw new BadRequestException(
         'Não foi possivel encontrar a inscrição desse usuário',
         {
-          cause: new Error('Inscrição não encontrado'),
-          description: 'Inscrição não encontrado',
+          cause: new Error('Inscrição não encontrada'),
+          description: 'Inscrição não encontrada',
         },
       );
     }

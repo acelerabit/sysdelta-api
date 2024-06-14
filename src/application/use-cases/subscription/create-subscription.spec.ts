@@ -4,8 +4,9 @@ import { InMemoryPlanRepository } from 'test/repositories/plan/in-memory-plan-re
 import { InMemorySubscriptionRepository } from 'test/repositories/subscription/in-memory-subscription-repository';
 import { InMemoryUsersRepository } from 'test/repositories/user/in-memory-user-repository';
 import { CreateSubscription } from './create-subscription';
-import { DayjsService } from '../../../providers/dayjs';
 import { vi } from 'vitest';
+import { FakeHasher } from 'test/cryptography/fake-hasher';
+import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
 
 vi.mock('../../../../utils/hash-password', () => ({
   hashPassword: vi.fn().mockReturnValue('sdjksjdlkjskld'),
@@ -27,17 +28,17 @@ describe('Create Subscription usecase', () => {
   it('Should be able to create a payment intent', async () => {
     const planRepository = new InMemoryPlanRepository();
     const usersRepository = new InMemoryUsersRepository();
-    const dayjsService = new DayjsService();
+    const hasher = new BcryptHasher();
     const subRepository = new InMemorySubscriptionRepository(usersRepository);
 
-    const stripeServiceMock = mock();
+    const billingServiceMock = mock();
     const usecase = new CreateSubscription(
       usersRepository,
 
       planRepository,
       subRepository,
-      stripeServiceMock,
-      dayjsService,
+      billingServiceMock,
+      hasher,
     );
 
     const newPlan = new Plan({
@@ -49,9 +50,6 @@ describe('Create Subscription usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: true,
-      qtdProjects: 1,
       trialDays: 10,
     });
 
@@ -64,7 +62,7 @@ describe('Create Subscription usecase', () => {
         email: 'customer@gmail.com',
         password: '123',
       },
-      acceptNotification: true,
+      acceptNotifications: true,
     });
 
     expect(subRepository.subs[0].id).toBeDefined();

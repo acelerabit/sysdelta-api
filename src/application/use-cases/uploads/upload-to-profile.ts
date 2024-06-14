@@ -9,6 +9,10 @@ interface UploadToProfileRequest {
   id: string;
 }
 
+interface UploadToProfileResponse {
+  url: string;
+}
+
 @Injectable()
 export class UploadToProfile {
   constructor(
@@ -16,7 +20,9 @@ export class UploadToProfile {
     private uploader: Upload,
   ) {}
 
-  async execute(request: UploadToProfileRequest): Promise<void> {
+  async execute(
+    request: UploadToProfileRequest,
+  ): Promise<UploadToProfileResponse> {
     const { file, id } = request;
 
     const user = await this.usersRepository.findById(id);
@@ -37,7 +43,7 @@ export class UploadToProfile {
 
       await this.usersRepository.update(user);
 
-      return;
+      return { url };
     } catch (err) {
       throw new BadRequestException(`Não foi possivel fazer o upload`, {
         cause: new Error(`Não foi possivel fazer o upload`),

@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Plan } from 'src/application/entities/plan';
 import { InMemoryPlanRepository } from 'test/repositories/plan/in-memory-plan-repository';
-import { DeactivePlan } from './deactive-plan';
+import { DeactivatePlan } from './deactive-plan';
 import { vi } from 'vitest';
 
 describe('Deactive Plan usecase', () => {
@@ -14,7 +14,10 @@ describe('Deactive Plan usecase', () => {
   it('Should be able to deactive a plan', async () => {
     const inMemoryPlanRepository = new InMemoryPlanRepository();
     const stripeServiceMock = mock();
-    const usecase = new DeactivePlan(inMemoryPlanRepository, stripeServiceMock);
+    const usecase = new DeactivatePlan(
+      inMemoryPlanRepository,
+      stripeServiceMock,
+    );
 
     const newPlan = new Plan({
       active: true,
@@ -25,9 +28,6 @@ describe('Deactive Plan usecase', () => {
       value: 1000,
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: true,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);

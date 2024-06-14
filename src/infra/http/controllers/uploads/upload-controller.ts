@@ -38,11 +38,11 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: string,
   ) {
-    await this.uploadToProfile.execute({
+    const { url } = await this.uploadToProfile.execute({
       file,
       id,
     });
 
-    return;
+    return { url };
   }
 }

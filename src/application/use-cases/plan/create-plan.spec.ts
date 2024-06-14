@@ -29,9 +29,6 @@ describe('Create Plan usecase', () => {
       name: 'Basic',
       value: 1000,
       durationInMonths: 1,
-      qtdReports: 10,
-      canIntegrate: true,
-      qtdProjects: 1,
     });
 
     expect(plan.id).toBeDefined();

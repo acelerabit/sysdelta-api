@@ -48,10 +48,8 @@ describe('Cancel subscription usecase', () => {
       interval: 'month',
       durationInMonths: 0,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
       trialDays: 0,
+      isDefault: true,
     });
 
     const planCharged = new Plan({
@@ -63,9 +61,6 @@ describe('Cancel subscription usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
       trialDays: 10,
     });
 

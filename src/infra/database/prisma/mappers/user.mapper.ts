@@ -1,8 +1,8 @@
 import { User } from 'src/application/entities/user';
-import { Prisma, User as PrismaUser } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class PrismaUsersMapper {
-  static toDomain(user: PrismaUser) {
+  static toDomain(user: any) {
     return User.create(
       {
         email: user.email,
@@ -13,6 +13,7 @@ export class PrismaUsersMapper {
         acceptNotifications: user.acceptNotifications,
         externalId: user.externalId,
         createdAt: user.createdAt,
+        subscriptionId: user?.subscription?.id ?? null,
       },
       user.id,
     );

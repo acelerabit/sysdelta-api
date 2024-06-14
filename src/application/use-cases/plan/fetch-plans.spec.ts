@@ -17,9 +17,6 @@ describe('Fetch Plans usecase', () => {
       value: 1000,
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     const newPlan2 = new Plan({
@@ -31,9 +28,6 @@ describe('Fetch Plans usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);

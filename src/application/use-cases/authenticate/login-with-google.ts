@@ -117,8 +117,6 @@ export class LoginWithGoogle {
 
     delete newUser.password;
 
-    await this.usersRepository.create(newUser);
-
     return { accessToken: token, user: newUser, subscriptionValue };
   }
 

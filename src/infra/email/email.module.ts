@@ -4,7 +4,7 @@ import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
 import { resolve } from 'node:path';
-import { EMAIL_QUEUE } from '@/common/constants';
+import { EMAIL_QUEUE, PAYMENT_CHECK_QUEUE } from '@/common/constants';
 import { SendMailConsumerSendGrid } from '../jobs/send-mail-sendgrid.consumer';
 import { SendGridClient } from './sendgrid/send-grid.client';
 
@@ -19,9 +19,14 @@ const url = new URL(process.env.REDIS_URL);
         password: url.password,
       },
     }),
-    BullModule.registerQueue({
-      name: EMAIL_QUEUE,
-    }),
+    BullModule.registerQueue(
+      {
+        name: EMAIL_QUEUE,
+      },
+      {
+        name: PAYMENT_CHECK_QUEUE,
+      },
+    ),
     MailerModule.forRoot({
       transport: {
         host: process.env.SMTP_HOST,

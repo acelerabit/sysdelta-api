@@ -41,4 +41,12 @@ export class InMemoryUsersRepository implements UsersRepository {
 
     return;
   }
+
+  async findAllWithoutPaginate(): Promise<User[]> {
+    return this.users;
+  }
+
+  async count(): Promise<number> {
+    return this.users.length;
+  }
 }

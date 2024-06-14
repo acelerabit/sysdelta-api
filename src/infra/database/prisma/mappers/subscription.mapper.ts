@@ -3,15 +3,8 @@ import { Subscription } from 'src/application/entities/subscription';
 import { PrismaPlansMapper } from './plan.mapper';
 import { PrismaUsersMapper } from './user.mapper';
 
-type SubscriptionFullType = Prisma.SubscriptionGetPayload<{
-  include: {
-    plan: true;
-    user: true;
-  };
-}>;
-
 export class PrismaSubscriptionsMapper {
-  static toDomain(subscription: SubscriptionFullType) {
+  static toDomain(subscription: any) {
     return Subscription.create(
       {
         active: subscription.active,

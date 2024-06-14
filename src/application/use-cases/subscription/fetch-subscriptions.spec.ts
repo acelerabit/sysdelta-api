@@ -28,9 +28,6 @@ describe('List Subscription usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: true,
-      qtdProjects: 1,
     });
 
     await planRepository.create(newPlan);

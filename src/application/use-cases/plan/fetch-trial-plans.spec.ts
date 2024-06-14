@@ -17,9 +17,6 @@ describe('Fetch Plans with trial period usecase', () => {
       value: 1000,
       durationInMonths: 1,
       trialDays: 0,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
       public: true,
     });
 
@@ -33,9 +30,6 @@ describe('Fetch Plans with trial period usecase', () => {
       durationInMonths: 1,
       trialDays: 20,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     const newPlan3 = new Plan({
@@ -48,9 +42,6 @@ describe('Fetch Plans with trial period usecase', () => {
       durationInMonths: 1,
       trialDays: 20,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);

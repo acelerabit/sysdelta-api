@@ -47,6 +47,8 @@ export class CreatePaymentIntent {
         );
       }
 
+      // console.log({ user, plan });
+
       const price = await this.billingService.retrievePrice(
         plan.priceExternalId,
       );
@@ -71,12 +73,14 @@ export class CreatePaymentIntent {
       };
     }
 
+    // console.log(user.subscription);
+
     const subscription = await this.subRepository.findById(user.subscriptionId);
 
     if (!subscription) {
       throw new BadRequestException('Não foi possivel encontrar a inscriçao', {
-        cause: new Error('Inscrição não encontrado'),
-        description: 'Inscrição não encontrado',
+        cause: new Error('Inscrição não encontrada'),
+        description: 'Inscrição não encontrada',
       });
     }
 

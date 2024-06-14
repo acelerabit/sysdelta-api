@@ -17,9 +17,6 @@ describe('Publish Plan usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);

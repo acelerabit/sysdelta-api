@@ -85,6 +85,8 @@ export class PlanController {
         durationInMonths: plan.durationInMonths,
         name: plan.name,
         trialDays: plan.trialDays,
+        isDefault: plan.isDefault,
+        public: plan.public,
       };
     });
   }

@@ -20,7 +20,7 @@ model User {
 
   name                String
   email               String  @unique
-  password            String
+  password            String?
   avatarUrl           String? @map("avatar_url")
   acceptNotifications Boolean @default(false) @map("accept_notifications")
   externalId          String? @map("external_id")

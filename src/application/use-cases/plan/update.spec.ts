@@ -34,9 +34,6 @@ describe('Update price plan usecase', () => {
       interval: 'month',
       durationInMonths: 1,
       public: false,
-      qtdReports: 10,
-      canIntegrate: false,
-      qtdProjects: 1,
     });
 
     await inMemoryPlanRepository.create(newPlan);
@@ -47,9 +44,6 @@ describe('Update price plan usecase', () => {
       durationInMonths: 2,
       trialDays: 10,
       name: 'TESTE 2',
-      canIntegrate: false,
-      qtdProjects: 1,
-      qtdReports: 10,
     });
 
     expect(plan.id).toBeDefined();

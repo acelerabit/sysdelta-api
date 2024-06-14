@@ -320,6 +320,11 @@ export class BillingService implements BillingServiceInterface {
   ) {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
+    await this.attachPaymentToCustomer(
+      customerId,
+      paymentIntent.payment_method.toString(),
+    );
+
     await stripe.customers.update(customerId, {
       invoice_settings: {
         default_payment_method: paymentIntent.payment_method.toString(),

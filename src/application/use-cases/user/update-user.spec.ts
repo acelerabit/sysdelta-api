@@ -27,6 +27,7 @@ describe('Update User', () => {
       name: 'new name',
       email: 'johndoe@example.com',
       role: 'ADMIN',
+      acceptNotifications: true,
     });
 
     expect(inMemoryUsersRepository.users[0].name).toEqual('new name');

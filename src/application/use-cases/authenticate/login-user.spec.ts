@@ -6,6 +6,7 @@ import { InMemoryUsersRepository } from './../../../../test/repositories/user/in
 import { User } from './../../entities/user';
 import { CreateUser } from './../user/create-user';
 import { LoginUser } from './login-user';
+import { randomUUID } from 'crypto';
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
 let loginUser: LoginUser;
@@ -21,18 +22,34 @@ describe('Authenticate User', () => {
     };
   });
 
+  const mock = vi.fn().mockImplementation(() => {
+    return {
+      createCustomer: vi.fn().mockReturnValue({
+        customer: {
+          id: randomUUID(),
+        },
+      }),
+    };
+  });
+
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository();
     fakeHasher = new FakeHasher();
     fakeEncrypter = new FakeEncrypter();
     jwt = mockJwt();
+    const billingServiceMock = mock();
+
     loginUser = new LoginUser(
       inMemoryUsersRepository,
       fakeHasher,
       fakeEncrypter,
       jwt,
     );
-    createUser = new CreateUser(inMemoryUsersRepository, fakeHasher);
+    createUser = new CreateUser(
+      inMemoryUsersRepository,
+      fakeHasher,
+      billingServiceMock,
+    );
   });
 
   it('should be able login with existent user', async () => {
