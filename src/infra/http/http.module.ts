@@ -61,6 +61,7 @@ import { FetchPayments } from '@/application/use-cases/payments/fetch-payments';
 import { FetchUnpaidPayments } from '@/application/use-cases/payments/fetch-unpaid-payments';
 import { CreatePaymentIntent } from '@/application/use-cases/payments/create-payment-intent';
 import { BcryptHasher } from '../cryptography/bcrypt-hasher';
+import { CreatePayment } from '@/application/use-cases/payments/create-payment';
 
 @Module({
   controllers: [
@@ -123,6 +124,7 @@ import { BcryptHasher } from '../cryptography/bcrypt-hasher';
     FetchUnpaidPayments,
     CreatePaymentIntent,
     BcryptHasher,
+    CreatePayment,
   ],
   imports: [DatabaseModule, EmailModule, CryptographyModule, SchedulesModule],
 })

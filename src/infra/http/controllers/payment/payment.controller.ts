@@ -1,3 +1,4 @@
+import { CreatePayment } from '@/application/use-cases/payments/create-payment';
 import { CreatePaymentIntent } from '@/application/use-cases/payments/create-payment-intent';
 import { BillingWebhookService } from '@/infra/billing/billing-webhook.service';
 import {
@@ -21,6 +22,7 @@ export class PaymentController {
     private fetchPayments: FetchPayments,
     private fetchUnpaidPayments: FetchUnpaidPayments,
     private createPaymentIntent: CreatePaymentIntent,
+    private createPaymentSub: CreatePayment,
   ) {}
 
   @Auth(Role.ADMIN, Role.USER)
@@ -63,6 +65,18 @@ export class PaymentController {
   ) {
     const { planId } = query;
     return this.createPaymentIntent.execute({
+      userId,
+      planId,
+    });
+  }
+
+  @Post('/create-payment/user/:userId')
+  async createPaymentToSub(
+    @Param('userId') userId: string,
+    @Body() body: { planId?: string },
+  ) {
+    const { planId } = body;
+    return this.createPaymentSub.execute({
       userId,
       planId,
     });

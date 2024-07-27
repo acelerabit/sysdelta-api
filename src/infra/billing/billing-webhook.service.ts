@@ -28,6 +28,61 @@ export class BillingWebhookService {
       case 'invoice.upcoming': // alguns dias antes da fatura vencer
         console.log('UPCOMING');
         break;
+      case 'invoice.updated':
+        const invoiceUpdated = event.data.object;
+
+        const findInvoiceUpdated = await this.prisma.payment.findFirst({
+          where: {
+            externalId: invoiceUpdated.id,
+          },
+        });
+
+        if (!findInvoiceUpdated) return;
+
+        await this.prisma.payment.update({
+          where: {
+            externalId: findInvoiceUpdated.id,
+          },
+          data: {
+            status: findInvoiceUpdated.status,
+          },
+        });
+
+        break;
+      case 'customer.subscription.created': // alguns dias antes da fatura vencer
+        // console.log('STRIPE SUB CREATED', event.data);
+        console.log('STRIPE SUB CREATED');
+
+        break;
+      case 'customer.subscription.updated': // alguns dias antes da fatura vencer
+        // update the subscription status
+        console.log('STRIPE SUB UPDATED', event.data.object);
+        const invoiceSubUpdated = event.data.object;
+
+        const findSubUpdated = await this.prisma.subscription.findFirst({
+          where: {
+            externalId: invoiceSubUpdated.id,
+          },
+        });
+
+        if (!findSubUpdated) return;
+
+        await this.prisma.subscription.update({
+          where: {
+            id: findSubUpdated.id,
+          },
+          data: {
+            planStatus: invoiceSubUpdated.status,
+          },
+        });
+
+        break;
+
+      case 'payment_intent.succeeded': // alguns dias antes da fatura vencer
+        // console.log('STRIPE PAYMENT INTENT PAID', event.data);
+        console.log('STRIPE PAYMENT INTENT PAID');
+
+        break;
       case 'invoice.created': // no dia do vencimento da fatura
         console.log('INVOICE CREATED');
 
@@ -147,18 +202,17 @@ export class BillingWebhookService {
           where: {
             externalId: failedInvoice.id,
           },
+          include: {
+            user: true,
+          },
         });
 
         if (!findCreatedInvoice)
           throw new NotFoundException('Pagamento não criado');
 
-        await this.paymentCheckQueue.add(
-          'payment-check-task',
-          { invoiceId: failedInvoice.id },
-          {
-            delay: 3 * 24 * 60 * 60 * 1000, // 3 dias em milissegundos
-          },
-        );
+        if (findCreatedInvoice.attempts > 0) {
+          return;
+        }
 
         await this.sendMailQueue.add('send-mail-job', {
           email: updatedPayment.user.email,
@@ -184,24 +238,6 @@ export class BillingWebhookService {
 
         if (!findOverduedInvoice)
           throw new NotFoundException('Pagamento não criado');
-
-        await this.paymentCheckQueue.add(
-          'payment-check-task',
-          { invoiceId: overduedInvoice.id },
-          {
-            delay: 3 * 24 * 60 * 60 * 1000, // 3 dias em milissegundos
-          },
-        );
-
-        await this.sendMailQueue.add('send-mail-job', {
-          email: updatedPayment.user.email,
-          subject: 'Falha no pagamento',
-          templateName: 'payment-failed.hbs',
-          context: {
-            paymentUrl: findCreatedInvoice.voucher,
-            // supportUrl: `https://feedbit.com/support`,
-          },
-        });
         break;
       case 'customer.subscription.deleted': // quando uma subscription acaba
         console.log('CUSTOMER SUBSCRIPTION DELETED');

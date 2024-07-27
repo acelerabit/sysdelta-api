@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import Stripe from 'stripe';
 import 'dotenv/config';
 import { BillingServiceInterface } from './billing.interface';
+import { randomUUID } from 'node:crypto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -12,11 +18,16 @@ export class BillingService implements BillingServiceInterface {
     email: string;
     metadata?: any;
   }): Promise<any> {
-    const customer = await stripe.customers.create({
-      name: data.name,
-      email: data.email,
-      metadata: data.metadata ?? {},
-    });
+    const customer = await stripe.customers.create(
+      {
+        name: data.name,
+        email: data.email,
+        metadata: data.metadata ?? {},
+      },
+      {
+        idempotencyKey: randomUUID(),
+      },
+    );
 
     return customer;
   }
@@ -38,6 +49,17 @@ export class BillingService implements BillingServiceInterface {
       },
     });
     return newPrice;
+  }
+
+  async createAPurePrice(price: number, duration_months: number) {
+    return await stripe.prices.create({
+      unit_amount: price * 100,
+      currency: 'BRL',
+      recurring: {
+        interval: 'month',
+        interval_count: duration_months,
+      },
+    });
   }
 
   async createProduct(data: {
@@ -245,32 +267,288 @@ export class BillingService implements BillingServiceInterface {
     customerId: string,
     priceId: string,
     trial_period_days: number,
+    paymentMethod?: string,
   ) {
-    const subscription = await stripe.subscriptions.create({
+    try {
+      const subscriptionByCustomer = await stripe.subscriptions.list({
+        customer: customerId,
+      });
+
+      if (subscriptionByCustomer.data.length > 0) {
+        console.log('Usuário já tem uma subscription no stripe');
+      }
+
+      let options: Stripe.SubscriptionCreateParams;
+
+      if (paymentMethod) {
+        options = {
+          customer: customerId,
+          items: [
+            {
+              price: priceId,
+            },
+          ],
+          trial_period_days,
+          default_payment_method: paymentMethod ?? null,
+          payment_settings: {
+            save_default_payment_method: 'on_subscription',
+            payment_method_types: ['card'], // exclui 'boleto'
+          },
+          payment_behavior: 'default_incomplete',
+          expand: ['latest_invoice.payment_intent'],
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause',
+            },
+          },
+        };
+      } else {
+        options = {
+          customer: customerId,
+          items: [
+            {
+              price: priceId,
+            },
+          ],
+          trial_period_days,
+          payment_settings: {
+            save_default_payment_method: 'on_subscription',
+            payment_method_types: ['card'], // exclui 'boleto'
+          },
+          payment_behavior: 'default_incomplete',
+          expand: ['latest_invoice.payment_intent'],
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause',
+            },
+          },
+        };
+      }
+
+      const subscription = await stripe.subscriptions.create(options);
+
+      return subscription;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async createSubscriptionWithoutDuplicate(
+    customerId: string,
+    priceId: string,
+    trial_period_days: number,
+    paymentMethod?: string,
+  ) {
+    try {
+      const subscriptionByCustomer = await stripe.subscriptions.list({
+        customer: customerId,
+      });
+
+      if (subscriptionByCustomer.data.length > 0) {
+        console.log('Usuário já tem uma subscription no stripe');
+        // @ts-ignore
+        console.log(
+          'SUBSCRIPTION',
+          subscriptionByCustomer.data[0].latest_invoice,
+        );
+        return;
+      }
+
+      let options;
+
+      if (paymentMethod) {
+        options = {
+          customer: customerId,
+          items: [
+            {
+              price: priceId,
+            },
+          ],
+          trial_period_days,
+          default_payment_method: paymentMethod ?? null,
+          payment_settings: {
+            save_default_payment_method: 'on_subscription',
+          },
+          payment_behavior: 'default_incomplete',
+          expand: ['latest_invoice.payment_intent'],
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause',
+            },
+          },
+        };
+      } else {
+        options = {
+          customer: customerId,
+          items: [
+            {
+              price: priceId,
+            },
+          ],
+          trial_period_days,
+          payment_behavior: 'default_incomplete',
+          payment_settings: {
+            save_default_payment_method: 'on_subscription',
+            payment_method_types: ['card'],
+          },
+          expand: ['latest_invoice.payment_intent'],
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause',
+            },
+          },
+        };
+      }
+
+      const subscription = await stripe.subscriptions.create(options);
+
+      // console.log('SUBSCRIPTION', subscription.latest_invoice);
+
+      return {
+        subscription,
+        // @ts-ignore
+        clientSecret: subscription.latest_invoice.payment_intent.client_secret,
+      };
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async createPaymentSub({
+    customerId,
+    priceId,
+    trial_period_days,
+  }: {
+    customerId: string;
+    priceId: string;
+    trial_period_days: number;
+  }) {
+    const customerSubscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      items: [
-        {
-          price: priceId,
-        },
-      ],
-      trial_period_days,
-      payment_settings: {
-        save_default_payment_method: 'on_subscription',
-      },
-      trial_settings: {
-        end_behavior: {
-          missing_payment_method: 'pause',
-        },
-      },
+      expand: ['data.latest_invoice.payment_intent'],
     });
 
-    return subscription;
+    if (customerSubscriptions.data.length > 0) {
+      const customerActiveSub = customerSubscriptions.data.find(
+        (sub) => sub.status === 'active',
+      );
+
+      if (customerActiveSub) {
+        throw new BadRequestException('Usuário já tem uma assinatura');
+      }
+
+      const customerSubscription = customerSubscriptions.data.find(
+        (sub) => sub.status === 'incomplete',
+      );
+
+      if (customerSubscription) {
+        console.log(
+          customerSubscription.latest_invoice,
+          'CUSTOMERS SUBSCRIPTIONS',
+        );
+
+        return {
+          subscriptionId: customerSubscription.id,
+
+          clientSecret:
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
+            customerSubscription.latest_invoice.payment_intent.client_secret,
+        };
+      }
+    }
+
+    const subscription = await stripe.subscriptions.create(
+      {
+        customer: customerId,
+        items: [
+          {
+            price: priceId,
+          },
+        ],
+        trial_period_days,
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.payment_intent'],
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: 'pause',
+          },
+        },
+      },
+      {
+        idempotencyKey: randomUUID(),
+      },
+    );
+
+    return {
+      subscriptionId: subscription.id,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      clientSecret: subscription.latest_invoice.payment_intent.client_secret,
+    };
+  }
+
+  async retrieveSubscriptionByCustomer(customerId: string) {
+    const customerSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+    });
+
+    const customerActiveSub = customerSubscriptions.data.find(
+      (sub) => sub.status === 'active',
+    );
+
+    if (!customerActiveSub) {
+      throw new BadRequestException('Inscrição não encontrada');
+    }
+
+    return customerActiveSub;
+  }
+
+  async retrieveAnySubscriptionByCustomer(customerId: string) {
+    const customerSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+    });
+
+    const customerActiveSub = customerSubscriptions.data.find(
+      (sub) =>
+        sub.status === 'active' ||
+        sub.status === 'trialing' ||
+        sub.status === 'unpaid' ||
+        sub.status === 'past_due',
+    );
+
+    if (!customerActiveSub) {
+      throw new BadRequestException('Inscrição não encontrada');
+    }
+
+    return customerActiveSub;
+  }
+
+  async retrieveTrialSubscriptionByCustomer(customerId: string) {
+    const customerSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+    });
+
+    const customerActiveSub = customerSubscriptions.data.find(
+      (sub) => sub.status === 'trialing',
+    );
+
+    if (!customerActiveSub) {
+      throw new BadRequestException('Inscrição não encontrada');
+    }
+
+    return customerActiveSub;
   }
 
   async cancelSubscription(subscriptionId: string) {
-    const subscription = await stripe.subscriptions.cancel(subscriptionId);
+    try {
+      const subscription = await stripe.subscriptions.cancel(subscriptionId);
 
-    return { subscription };
+      return { subscription };
+    } catch (err) {
+      throw new NotFoundException('Assinatura não encontrada no stripe');
+    }
   }
 
   async deleteProduct(productId: string) {
@@ -291,7 +569,10 @@ export class BillingService implements BillingServiceInterface {
           price: priceId,
         },
       ],
-      payment_settings: { save_default_payment_method: 'on_subscription' },
+      payment_settings: {
+        save_default_payment_method: 'on_subscription',
+        payment_method_types: ['card'],
+      },
     });
 
     return subscription;
@@ -311,6 +592,14 @@ export class BillingService implements BillingServiceInterface {
         default_payment_method: paymentMethodId,
       },
     });
+
+    const customerSub = await this.retrieveAnySubscriptionByCustomer(
+      customerId,
+    );
+
+    await stripe.subscriptions.update(customerSub.id, {
+      default_payment_method: paymentMethodId,
+    });
   }
 
   async activateSubscription(
@@ -318,27 +607,51 @@ export class BillingService implements BillingServiceInterface {
     paymentIntentId: string,
     subscriptionId: string,
   ) {
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    try {
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId,
+      );
 
-    await this.attachPaymentToCustomer(
-      customerId,
-      paymentIntent.payment_method.toString(),
-    );
+      await this.attachPaymentToCustomer(
+        customerId,
+        paymentIntent.payment_method.toString(),
+      );
 
-    await stripe.customers.update(customerId, {
-      invoice_settings: {
-        default_payment_method: paymentIntent.payment_method.toString(),
-      },
+      await stripe.customers.update(customerId, {
+        // default_source: paymentIntent.payment_method.toString(),
+        invoice_settings: {
+          default_payment_method: paymentIntent.payment_method.toString(),
+        },
+      });
+
+      const subscription = await stripe.subscriptions.update(subscriptionId, {
+        trial_end: 'now',
+      });
+
+      return {
+        paymentMethodId: paymentIntent.payment_method.toString(),
+        subscription,
+      };
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async updateSubscriptionPrice(newPrice: string, subscriptionId: string) {
+    const subscription = await this.retrieveSubscription(subscriptionId);
+
+    const items = subscription.items;
+    const [item] = items.data;
+
+    await stripe.subscriptions.update(subscription.id, {
+      items: [
+        {
+          id: item.id,
+          price: newPrice,
+        },
+      ],
+      proration_behavior: 'none',
     });
-
-    const subscription = await stripe.subscriptions.update(subscriptionId, {
-      trial_end: 'now',
-    });
-
-    return {
-      paymentMethodId: paymentIntent.payment_method.toString(),
-      subscription,
-    };
   }
 
   async updateAllSubscriptionsWithNewPrice(

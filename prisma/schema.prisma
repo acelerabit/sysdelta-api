@@ -96,19 +96,30 @@ model Subscription {
   @@map("subscriptions")
 }
 
+enum PAYMENT_STATUS {
+  draft
+  open
+  paid
+  uncollectible
+  void
+}
+
 model Payment {
-  id             String       @id @default(uuid())
-  externalId     String       @unique @default(uuid()) @map("external_id")
+  id             String          @id @default(uuid())
+  externalId     String          @unique @default(uuid()) @map("external_id")
   value          Float
-  userId         String       @map("user_id")
-  user           User         @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  subscriptionId String       @map("subscription_id")
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  paymentDate    DateTime?    @map("payment_date")
-  completed      Boolean      @default(false)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  userId         String          @map("user_id")
+  user           User            @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  subscriptionId String          @map("subscription_id")
+  subscription   Subscription    @relation(fields: [subscriptionId], references: [id])
+  paymentDate    DateTime?       @map("payment_date")
+  completed      Boolean         @default(false)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
   voucher        String?
+  status         PAYMENT_STATUS? @default(open)
+
+  attempts Int @default(0)
 
   @@map("payments")
 }

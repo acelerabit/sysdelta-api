@@ -3,6 +3,8 @@ import { Replace } from 'src/helpers/Replace';
 import { User } from './user';
 import { Subscription } from './subscription';
 
+type PaymentStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
+
 export interface PaymentProps {
   externalId: string;
   value: number;
@@ -15,13 +17,25 @@ export interface PaymentProps {
   createdAt: Date;
   updatedAt: Date;
   voucher?: string;
+  status: PaymentStatus;
+  attempts: number;
 }
 
 export class Payment {
   private _id: string;
   private props: PaymentProps;
 
-  constructor(props: Replace<PaymentProps, { createdAt?: Date }>, id?: string) {
+  constructor(
+    props: Replace<
+      PaymentProps,
+      {
+        createdAt?: Date;
+        status?: PaymentStatus;
+        attempts?: number;
+      }
+    >,
+    id?: string,
+  ) {
     this._id = id ?? randomUUID();
     this.props = {
       ...props,
@@ -29,6 +43,8 @@ export class Payment {
       updatedAt: props.updatedAt ?? new Date(),
       voucher: props.voucher ?? null,
       paymentDate: props.paymentDate ?? null,
+      status: props.status ?? 'open',
+      attempts: props.attempts ?? 0,
     };
   }
 
@@ -50,6 +66,22 @@ export class Payment {
 
   set value(value: number) {
     this.props.value = value;
+  }
+
+  get attempts() {
+    return this.props.attempts;
+  }
+
+  set attempts(attempts: number) {
+    this.props.attempts = attempts;
+  }
+
+  get status() {
+    return this.props.status;
+  }
+
+  set status(status: PaymentStatus) {
+    this.props.status = status;
   }
 
   get userId() {
@@ -121,7 +153,10 @@ export class Payment {
   }
 
   static create(
-    props: Replace<PaymentProps, { createdAt?: Date }>,
+    props: Replace<
+      PaymentProps,
+      { createdAt?: Date; status?: PaymentStatus; attempts?: number }
+    >,
     id?: string,
   ) {
     const payment = new Payment(props, id);

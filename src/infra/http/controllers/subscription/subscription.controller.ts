@@ -62,15 +62,15 @@ export class SubscriptionController {
     @Param('userId') userId: string,
     @Body()
     body: {
-      paymentIntentId: string;
       planId?: string;
+      paymentMethod: string;
     },
   ) {
-    const { paymentIntentId, planId } = body;
+    const { planId, paymentMethod } = body;
     return this.activateSubscription.execute({
       userId,
-      paymentIntentId,
       planId,
+      paymentMethod,
     });
   }
 

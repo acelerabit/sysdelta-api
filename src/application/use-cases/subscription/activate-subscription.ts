@@ -6,7 +6,7 @@ import { UsersRepository } from 'src/application/repositories/user-repository';
 
 interface ActivateSubscriptionRequest {
   userId: string;
-  paymentIntentId: string;
+  paymentMethod: string;
   planId?: string;
 }
 
@@ -21,8 +21,8 @@ export class ActivateSubscription {
 
   async execute({
     userId,
-    paymentIntentId,
     planId,
+    paymentMethod,
   }: ActivateSubscriptionRequest): Promise<void> {
     const user = await this.userRepository.findById(userId);
 
@@ -33,7 +33,7 @@ export class ActivateSubscription {
       });
     }
 
-    const userSub = await this.subRepository.findByUserId(user.id);
+    const userSub = await this.subRepository.findById(user.subscriptionId);
 
     if (!userSub) {
       throw new BadRequestException(
@@ -55,49 +55,28 @@ export class ActivateSubscription {
         });
       }
 
-      const subCreated = await this.billingService.createSubscription(
+      await this.billingService.attachPaymentToCustomer(
         user.externalId,
-        plan.priceExternalId,
-        plan.trialDays,
+        paymentMethod,
       );
 
-      userSub.externalId = subCreated.id;
-      userSub.planStatus = subCreated.status;
-      userSub.expiration = subCreated.current_period_end;
+      const subRetrieved =
+        await this.billingService.retrieveSubscriptionByCustomer(
+          user.externalId,
+        );
+
+      userSub.externalId = subRetrieved.id;
+      userSub.planStatus = subRetrieved.status;
+      userSub.expiration = subRetrieved.current_period_end;
       userSub.planId = planId;
       userSub.value = plan.value;
       userSub.plan = plan;
+      userSub.paymentMethodId = paymentMethod;
 
-      await this.subRepository.update(userSub);
-
-      const { paymentMethodId, subscription } =
-        await this.billingService.activateSubscription(
-          user.externalId,
-          paymentIntentId,
-          userSub.externalId,
-        );
-
-      userSub.externalId = subscription.id;
-      userSub.paymentMethodId = paymentMethodId;
-      userSub.planStatus = subscription.status;
       await this.subRepository.update(userSub);
 
       return;
     }
-
-    const { paymentMethodId, subscription } =
-      await this.billingService.activateSubscription(
-        user.externalId,
-        paymentIntentId,
-        userSub.externalId,
-      );
-
-    userSub.externalId = subscription.id;
-    userSub.paymentMethodId = paymentMethodId;
-    userSub.planStatus = subscription.status;
-    userSub.expiration = subscription.current_period_end;
-
-    await this.subRepository.update(userSub);
 
     return;
   }
