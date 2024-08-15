@@ -1,31 +1,20 @@
 import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker';
 import { hash } from 'bcryptjs';
-
+import 'dotenv/config';
 const prisma = new PrismaClient();
 
 async function seed() {
   await prisma.user.deleteMany();
 
-  const passwordHash = await hash('123456', 1);
-  await prisma.user.createMany({
-    data: [
-      {
-        name: 'John doe',
-        email: 'johndoe@gmail.com',
-        password: passwordHash,
-      },
-      {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: passwordHash,
-      },
-      {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: passwordHash,
-      },
-    ],
+  const passwordHash = await hash(process.env.ROOT_SEED_PASSWORD, 8);
+
+  await prisma.user.create({
+    data: {
+      name: 'John doe',
+      email: 'root@gmail.com',
+      password: passwordHash,
+      role: 'ADMIN',
+    },
   });
 }
 

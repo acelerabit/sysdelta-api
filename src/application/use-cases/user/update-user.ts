@@ -6,7 +6,7 @@ export interface UpdateUserRequest {
   id: string;
   name: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: 'ADMIN' | 'PRESIDENT' | 'COUNCILOR' | 'SECRETARY' | 'ASSISTANT';
   acceptNotifications: boolean;
 }
 

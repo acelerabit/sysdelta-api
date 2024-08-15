@@ -1,6 +1,5 @@
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
-import { LoggingService } from '@/infra/services/logging.service';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
@@ -13,7 +12,7 @@ describe('Create user (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [LoggingService, PrismaService],
+      providers: [PrismaService],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -27,7 +26,7 @@ describe('Create user (E2E)', () => {
       name: 'John Doe',
       email: 'johndoe@gmail.com',
       password: '1234',
-      role: 'USER',
+      role: 'ASSISTANT',
     });
 
     expect(response.statusCode).toBe(201);

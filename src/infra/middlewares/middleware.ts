@@ -1,18 +1,30 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { jwtSecret } from '@/common/constants';
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class IpMiddleware implements NestMiddleware {
-  use(req, res, next) {
-    if (req.headers.authorization) {
-      const [, token] = req.headers.authorization.split(' ');
+export class CurrentUserMiddleware implements NestMiddleware {
+  constructor(private readonly jwtService: JwtService) {}
 
-      /**
-       *
-       * req.id = token.id
-       * req.email = token.email
-       */
+  async use(req, res, next) {
+    const token = req.headers['authorization']?.split(' ')[1];
 
-      return token;
+    if (token) {
+      try {
+        const decoded = await this.jwtService.verifyAsync(token, {
+          secret: jwtSecret,
+        });
+
+        req.userId = {
+          id: decoded.id,
+        };
+      } catch (err) {
+        throw new UnauthorizedException('Invalid token');
+      }
     }
 
     next();

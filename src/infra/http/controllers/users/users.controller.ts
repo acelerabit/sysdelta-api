@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Queue } from 'bull';
@@ -23,14 +24,6 @@ import { GetUserByEmailBody } from './dtos/get-user-by-email';
 import { GetUserByEmail } from '@/application/use-cases/user/get-user-by-email';
 import { FetchUsers } from '@/application/use-cases/user/fetch-users';
 import { UsersPresenters } from './presenters/user.presenter';
-
-/** If you want catch data from requests and responses, enable it */
-
-// const interceptor = new LoggingInterceptor(new LoggingService(), [
-//   'password',
-//   'access_token',
-//   'user.email',
-// ]);
 
 @Controller('users')
 export class UsersController {
@@ -113,11 +106,12 @@ export class UsersController {
     return UsersPresenters.toHTTP(user);
   }
 
-  @UseGuards(JwtUserAuthGuard)
-  @Get('/send-email')
-  async sendMail() {
-    await this.sendMailQueue.add('sendMail-job', { email: 'teste@gmail.com' });
+  // @UseGuards(JwtUserAuthGuard)
+  // @Get('/teste/send-email')
+  // async sendMail(@Req() req: any) {
+  //   console.log('Here', req?.userId);
+  //   // await this.sendMailQueue.add('sendMail-job', { email: 'teste@gmail.com' });
 
-    return;
-  }
+  //   return;
+  // }
 }

@@ -14,7 +14,7 @@ export class UpdateUserBody {
 
   @IsOptional()
   @IsNotEmpty()
-  role: 'USER' | 'ADMIN';
+  role: 'ADMIN' | 'PRESIDENT' | 'COUNCILOR' | 'SECRETARY' | 'ASSISTANT';
 
   @IsOptional()
   @IsNotEmpty()

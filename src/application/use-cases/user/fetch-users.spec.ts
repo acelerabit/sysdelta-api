@@ -16,7 +16,7 @@ describe('Fetch Users', () => {
       name: 'user-test',
       email: 'email@test.com',
       password: '123',
-      role: 'USER',
+      role: 'ASSISTANT',
       createdAt: new Date(),
     });
 
@@ -24,7 +24,7 @@ describe('Fetch Users', () => {
       name: 'user-test',
       email: 'email@test.com',
       password: '123',
-      role: 'USER',
+      role: 'ASSISTANT',
       createdAt: new Date(),
     });
 

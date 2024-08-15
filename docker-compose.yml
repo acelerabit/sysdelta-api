@@ -3,18 +3,18 @@ version: '3.7'
 services:
   database:
     image: postgres
-    container_name: setup
+    container_name: sysdelta
     restart: always
     ports:
       - 5442:5432
     environment:
       - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=setup_docker
-      - POSTGRES_DB=setup_docker
+      - POSTGRES_PASSWORD=sysdelta_docker
+      - POSTGRES_DB=sysdelta_docker
     volumes:
       - ./data/pg:/data/postgres
   redis:
-    container_name: setup-redis
+    container_name: sysdelta-redis
     image: redis:alpine
     ports:
       - 6379:6379

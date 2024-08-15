@@ -7,14 +7,7 @@ import { LogsRepository } from 'src/application/repositories/logs-repository';
 import { PrismaLogsRepository } from './prisma/repositories/prisma-logs-repository';
 import { NotificationRepository } from '@/application/repositories/notification-repository';
 import { PrismaNotificationsRepository } from './prisma/repositories/prisma-notifications-repository';
-import { PlanRepository } from '@/application/repositories/plan-repository';
-import { SubscriptionRepository } from '@/application/repositories/subscription-repository';
-import { PaymentRepository } from '@/application/repositories/payment-repository';
-import { PrismaPaymentRepository } from './prisma/repositories/prisma-payment-repository';
-import { PrismaSubscriptionRepository } from './prisma/repositories/prisma-subscription-repository';
-import { PrismaPlansRepository } from './prisma/repositories/prisma-plan-repository';
 import { DateService } from '../dates/date.service';
-import { BillingService } from '../billing/billing.service';
 
 @Module({
   providers: [
@@ -29,18 +22,6 @@ import { BillingService } from '../billing/billing.service';
     {
       provide: NotificationRepository,
       useClass: PrismaNotificationsRepository,
-    },
-    {
-      provide: PaymentRepository,
-      useClass: PrismaPaymentRepository,
-    },
-    {
-      provide: SubscriptionRepository,
-      useClass: PrismaSubscriptionRepository,
-    },
-    {
-      provide: PlanRepository,
-      useClass: PrismaPlansRepository,
     },
     {
       provide: PrismaService,
@@ -62,18 +43,6 @@ import { BillingService } from '../billing/billing.service';
     {
       provide: NotificationRepository,
       useClass: PrismaNotificationsRepository,
-    },
-    {
-      provide: PaymentRepository,
-      useClass: PrismaPaymentRepository,
-    },
-    {
-      provide: SubscriptionRepository,
-      useClass: PrismaSubscriptionRepository,
-    },
-    {
-      provide: PlanRepository,
-      useClass: PrismaPlansRepository,
     },
     {
       provide: PrismaService,

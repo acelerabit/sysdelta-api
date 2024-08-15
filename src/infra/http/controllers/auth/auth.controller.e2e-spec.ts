@@ -1,4 +1,3 @@
-import { LoggingService } from '@/infra/services/logging.service';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { hash } from 'bcrypt';
@@ -14,7 +13,7 @@ describe('Authenticate (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [LoggingService, PrismaService],
+      providers: [PrismaService],
     }).compile();
 
     app = moduleRef.createNestApplication();

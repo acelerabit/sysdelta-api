@@ -1,5 +1,5 @@
 {
-  "name": "setup-api",
+  "name": "sysdelta-api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.577.0",
+    "@aws-sdk/s3-request-presigner": "^3.629.0",
     "@faker-js/faker": "^8.4.1",
     "@nestjs-modules/mailer": "1.8.1",
     "@nestjs/bull": "^10.1.0",

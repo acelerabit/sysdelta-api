@@ -16,7 +16,7 @@ describe('Update User', () => {
       name: 'user-test',
       email: 'email@test.com',
       password: '123',
-      role: 'USER',
+      role: 'ASSISTANT',
       createdAt: new Date(),
     });
 
@@ -26,7 +26,7 @@ describe('Update User', () => {
       id: newUser.id,
       name: 'new name',
       email: 'johndoe@example.com',
-      role: 'ADMIN',
+      role: 'PRESIDENT',
       acceptNotifications: true,
     });
 
