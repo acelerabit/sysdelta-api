@@ -18,7 +18,7 @@ export class UploadController {
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('/')
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: any) {
     try {
       const id = await this.uploader.uploadFilePublic(file, `files`);
 
@@ -34,10 +34,7 @@ export class UploadController {
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('/:id')
-  async uploadProfile(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id: string,
-  ) {
+  async uploadProfile(@UploadedFile() file: any, @Param('id') id: string) {
     const { url } = await this.uploadToProfile.execute({
       file,
       id,

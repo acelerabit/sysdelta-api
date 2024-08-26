@@ -5,7 +5,7 @@ import { User } from './../../entities/user';
 import { Upload } from '@/infra/upload/upload';
 
 interface UploadToProfileRequest {
-  file: Express.Multer.File;
+  file: any;
   id: string;
 }
 

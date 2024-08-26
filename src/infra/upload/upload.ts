@@ -62,10 +62,7 @@ export class Upload implements Uploader {
     return url;
   }
 
-  async uploadFilePublic(
-    dataImage: Express.Multer.File,
-    folderName?: string,
-  ): Promise<string> {
+  async uploadFilePublic(dataImage: any, folderName?: string): Promise<string> {
     try {
       const idImage = randomUUID();
       const folderKey = folderName ? `${folderName}/${idImage}` : idImage;
@@ -83,10 +80,7 @@ export class Upload implements Uploader {
     }
   }
 
-  async uploadFile(
-    dataImage: Express.Multer.File,
-    folderName?: string,
-  ): Promise<string> {
+  async uploadFile(dataImage: any, folderName?: string): Promise<string> {
     try {
       const idImage = randomUUID();
       const folderKey = folderName ? `${folderName}/${idImage}` : idImage;

@@ -3,11 +3,8 @@ export abstract class Uploader {
   abstract getPublicImageUrl(imageKey: string): Promise<string>;
   abstract presignedURL(imageKey: string): Promise<string>;
   abstract uploadFilePublic(
-    dataImage: Express.Multer.File,
+    dataImage: any,
     folderName?: string,
   ): Promise<string>;
-  abstract uploadFile(
-    dataImage: Express.Multer.File,
-    folderName?: string,
-  ): Promise<string>;
+  abstract uploadFile(dataImage: any, folderName?: string): Promise<string>;
 }
