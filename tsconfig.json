@@ -21,7 +21,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vitest/globals", "node", "Multer", "express"],
+    "types": ["vitest/globals", "node", "multer", "express"],
     "typeRoots": ["./node_modules/@types"],
   }
 }
