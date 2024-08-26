@@ -4,7 +4,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 interface CityCouncilRequest {
   id: string;
-  userId: string;
 }
 
 interface CityCouncilResponse {

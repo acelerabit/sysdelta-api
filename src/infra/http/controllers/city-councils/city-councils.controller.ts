@@ -1,3 +1,4 @@
+import { AssignResponsibleToCityCouncil } from './../../../../application/use-cases/city-councils/assign-responsible-to-city-council';
 import { CreateCityCouncil } from '@/application/use-cases/city-councils/create-city-council';
 import { FetchCityCouncils } from '@/application/use-cases/city-councils/fetch-city-councils';
 import { GetCityCouncil } from '@/application/use-cases/city-councils/get-city-council';
@@ -16,31 +17,34 @@ import { Role } from '@prisma/client';
 import { UpdateCityCouncil } from './../../../../application/use-cases/city-councils/update-city-council';
 import { UpdateCityCouncilBody } from './dtos/update-city-council-body';
 import { CityCouncilsPresenters } from './presenters/create-city-council.presenter';
+import { CreateCityCouncilBody } from './dtos/create-city-council-body';
+import { FetchCityCouncilsWithoutPaginate } from '@/application/use-cases/city-councils/fetch-city-councils-without-paginate';
 
-@Controller('cityCouncils')
-export class cityCouncilsController {
+@Controller('city-councils')
+export class CityCouncilsController {
   constructor(
     private createCityCouncil: CreateCityCouncil,
     private fetchCityCouncils: FetchCityCouncils,
+    private fetchCityCouncilsWithoutPaginate: FetchCityCouncilsWithoutPaginate,
+    private assignResponsibleToCityCouncil: AssignResponsibleToCityCouncil,
     private updateCityCouncil: UpdateCityCouncil,
     private getCityCouncil: GetCityCouncil,
   ) {}
 
   @Auth(Role.ADMIN)
   @Post()
-  async create(@Body() body: { name: string; userId: string }) {
-    const { name, userId } = body;
+  async create(@Body() body: CreateCityCouncilBody, @Req() req: any) {
+    const { name, city, state, cnpj } = body;
 
     const { cityCouncil } = await this.createCityCouncil.execute({
       name,
-      userId,
+      city,
+      state,
+      cnpj,
+      userId: req.userId,
     });
 
     return {
-      responsible: {
-        name: cityCouncil.responsible.name,
-        email: cityCouncil.responsible.name,
-      },
       name: cityCouncil.name,
     };
   }
@@ -61,11 +65,37 @@ export class cityCouncilsController {
   }
 
   @Auth(Role.ADMIN)
+  @Get('/all')
+  async listWithoutPaginate() {
+    const { cityCouncils } =
+      await this.fetchCityCouncilsWithoutPaginate.execute();
+
+    return cityCouncils.map(CityCouncilsPresenters.toHTTP);
+  }
+
+  @Auth(Role.ADMIN)
   @Get('/:id')
-  async get(@Param('id') id: string, @Req() req: any) {
+  async get(@Param('id') id: string) {
     const { cityCouncil } = await this.getCityCouncil.execute({
       id,
+    });
+
+    return CityCouncilsPresenters.toHTTP(cityCouncil);
+  }
+
+  @Auth(Role.ADMIN)
+  @Post('/assign/:responsibleId')
+  async assign(
+    @Param('responsibleId') responsibleId: string,
+    @Req() req: any,
+    @Body() body: { cityCouncilId: string },
+  ) {
+    const { cityCouncilId } = body;
+
+    const { cityCouncil } = await this.assignResponsibleToCityCouncil.execute({
+      responsibleId,
       userId: req.userId,
+      cityCouncilId,
     });
 
     return CityCouncilsPresenters.toHTTP(cityCouncil);
@@ -74,10 +104,13 @@ export class cityCouncilsController {
   @Auth(Role.ADMIN)
   @Put('/update')
   async update(@Body() body: UpdateCityCouncilBody, @Req() req: any) {
-    const { name } = body;
+    const { name, city, state, cnpj } = body;
 
     const { cityCouncil } = await this.updateCityCouncil.execute({
       name,
+      city,
+      state,
+      cnpj,
       id: req.userId,
     });
 

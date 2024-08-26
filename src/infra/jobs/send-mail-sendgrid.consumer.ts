@@ -30,13 +30,12 @@ export class SendMailConsumerSendGrid {
           __dirname,
           '..',
           '..',
+          '..',
           'infra',
           'email',
           'templates',
           templateName,
         );
-
-        console.log(templatePath);
 
         const templateSource = fs.readFileSync(templatePath, 'utf8');
 

@@ -9,6 +9,15 @@ export class UsersPresenters {
       id: user.id,
       avatarUrl: user.avatarUrl,
       acceptNotifications: user.acceptNotifications,
+      phone: user.phone,
+      cpf: user.cpf,
+      politicalParty: user.politicalParty,
+      affiliatedCouncil: user.affiliatedCouncil
+        ? {
+            name: user.affiliatedCouncil.name,
+            id: user.affiliatedCouncil.id,
+          }
+        : null,
     };
   }
 }

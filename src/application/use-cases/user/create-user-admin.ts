@@ -1,27 +1,21 @@
+import { Encrypter } from '@/application/cryptography/encrypter';
 import { HashGenerator } from '@/application/cryptography/hash-generator';
+import { EMAIL_QUEUE } from '@/common/constants';
+import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Queue } from 'bull';
+import { randomUUID } from 'crypto';
 import { UsersRepository } from '../../repositories/user-repository';
 import { User } from './../../entities/user';
-import { CityCouncilsRepository } from '@/application/repositories/city-council-repository';
-import { randomUUID } from 'crypto';
-import { InjectQueue } from '@nestjs/bull';
-import { EMAIL_QUEUE } from '@/common/constants';
-import { Queue } from 'bull';
-import { Encrypter } from '@/application/cryptography/encrypter';
 
 interface UserRequest {
   requestOwnerId: string;
   name: string;
   email: string;
-  role: 'ADMIN' | 'PRESIDENT' | 'COUNCILOR' | 'SECRETARY' | 'ASSISTANT';
-  cityCouncilId: string;
-  cpf: string;
-  phone: string;
-  politicalParty: string;
 }
 
 interface UserResponse {
@@ -29,26 +23,16 @@ interface UserResponse {
 }
 
 @Injectable()
-export class CreateUser {
+export class CreateUserAdmin {
   constructor(
     private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
     private encrypter: Encrypter,
-    private cityCouncilsRepository: CityCouncilsRepository,
     @InjectQueue(EMAIL_QUEUE) private sendMailQueue: Queue,
   ) {}
 
   async execute(request: UserRequest): Promise<UserResponse> {
-    const {
-      email,
-      name,
-      role,
-      cityCouncilId,
-      requestOwnerId,
-      cpf,
-      phone,
-      politicalParty,
-    } = request;
+    const { email, name, requestOwnerId } = request;
 
     const userWithSameEmail = await this.usersRepository.findByEmail(email);
 
@@ -56,17 +40,6 @@ export class CreateUser {
       throw new BadRequestException(`Usuário com email ${email} já existe`, {
         cause: new Error(`Usuário com email ${email} já existe`),
         description: `Usuário com email ${email} já existe`,
-      });
-    }
-
-    const cityCouncil = await this.cityCouncilsRepository.findById(
-      cityCouncilId,
-    );
-
-    if (!cityCouncil) {
-      throw new BadRequestException('Não foi possivel encontrar a câmara', {
-        cause: new Error('Câmara não encontrada'),
-        description: 'Câmara não encontrada',
       });
     }
 
@@ -79,18 +52,9 @@ export class CreateUser {
       });
     }
 
-    if (
-      requestOwner.role === 'COUNCILOR' ||
-      requestOwner.role === 'SECRETARY'
-    ) {
+    if (requestOwner.role !== 'ADMIN') {
       throw new UnauthorizedException(
         'Usuário não tem permissão para executar essa ação',
-      );
-    }
-
-    if (requestOwner.role === 'ASSISTANT' && role !== 'COUNCILOR') {
-      throw new UnauthorizedException(
-        'Usuário auxiliar não tem permissão para criar usuários desse tipo',
       );
     }
 
@@ -101,13 +65,8 @@ export class CreateUser {
     const user = User.create({
       name,
       email,
-      role,
+      role: 'ADMIN',
       password: hashedPassword,
-      createdAt: new Date(),
-      affiliatedCouncilId: cityCouncil.id,
-      cpf,
-      phone,
-      politicalParty,
     });
 
     await this.usersRepository.create(user);

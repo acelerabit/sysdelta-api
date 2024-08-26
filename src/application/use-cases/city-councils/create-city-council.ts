@@ -3,12 +3,15 @@ import { CityCouncilsRepository } from '@/application/repositories/city-council-
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../repositories/user-repository';
 
-interface UserRequest {
+interface CreateCityCouncilRequest {
   name: string;
+  city: string;
+  state: string;
+  cnpj: string;
   userId: string;
 }
 
-interface UserResponse {
+interface CreateCityCouncilResponse {
   cityCouncil: CityCouncil;
 }
 
@@ -19,12 +22,14 @@ export class CreateCityCouncil {
     private cityCouncilRepository: CityCouncilsRepository,
   ) {}
 
-  async execute(request: UserRequest): Promise<UserResponse> {
-    const { userId, name } = request;
+  async execute(
+    request: CreateCityCouncilRequest,
+  ): Promise<CreateCityCouncilResponse> {
+    const { userId, name, city, state, cnpj } = request;
 
     const user = await this.usersRepository.findById(userId);
 
-    if (user) {
+    if (!user) {
       throw new BadRequestException(`Usuário não encontrado`, {
         cause: new Error(`Usuário não encontrado`),
         description: `Usuário não encontrado`,
@@ -43,6 +48,9 @@ export class CreateCityCouncil {
 
     const cityCouncil = CityCouncil.create({
       name,
+      city,
+      state,
+      cnpj,
     });
 
     await this.cityCouncilRepository.create(cityCouncil);

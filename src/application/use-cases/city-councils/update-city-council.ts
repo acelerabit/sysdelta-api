@@ -5,6 +5,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 export interface UpdateCityCouncilRequest {
   id: string;
   name: string;
+  city: string;
+  state: string;
+  cnpj: string;
 }
 
 export interface UpdateCityCouncilResponse {
@@ -18,6 +21,9 @@ export class UpdateCityCouncil {
   async execute({
     id,
     name,
+    city,
+    state,
+    cnpj,
   }: UpdateCityCouncilRequest): Promise<UpdateCityCouncilResponse> {
     const cityCouncil = await this.cityCouncilsRepository.findById(id);
 
@@ -32,6 +38,18 @@ export class UpdateCityCouncil {
 
     if (name) {
       updates.name = name;
+    }
+
+    if (city) {
+      updates.city = city;
+    }
+
+    if (state) {
+      updates.state = state;
+    }
+
+    if (cnpj) {
+      updates.cnpj = cnpj;
     }
 
     Object.assign(cityCouncil, updates);

@@ -29,6 +29,16 @@ import { FetchUsers } from '@/application/use-cases/user/fetch-users';
 import { UploadToProfile } from '@/application/use-cases/uploads/upload-to-profile';
 import { ReadAllNotifications } from '@/application/use-cases/notifications/read-all-unread-notifications';
 import { BcryptHasher } from '../cryptography/bcrypt-hasher';
+import { CityCouncilsController } from './controllers/city-councils/city-councils.controller';
+import { CreateCityCouncil } from '@/application/use-cases/city-councils/create-city-council';
+import { FetchCityCouncils } from '@/application/use-cases/city-councils/fetch-city-councils';
+import { UpdateCityCouncil } from '@/application/use-cases/city-councils/update-city-council';
+import { GetCityCouncil } from '@/application/use-cases/city-councils/get-city-council';
+import { FetchUsersByCityCouncil } from '@/application/use-cases/user/fetch-users-by-city-council';
+import { FetchCityCouncilsWithoutPaginate } from '@/application/use-cases/city-councils/fetch-city-councils-without-paginate';
+import { FetchUsersAdmin } from '@/application/use-cases/user/fetch-admin-users';
+import { CreateUserAdmin } from '@/application/use-cases/user/create-user-admin';
+import { AssignResponsibleToCityCouncil } from '@/application/use-cases/city-councils/assign-responsible-to-city-council';
 
 @Module({
   controllers: [
@@ -39,9 +49,11 @@ import { BcryptHasher } from '../cryptography/bcrypt-hasher';
     RecoveryPasswordController,
     UploadController,
     DashboardController,
+    CityCouncilsController,
   ],
   providers: [
     CreateUser,
+    CreateUserAdmin,
     LoginUser,
     LoginWithGoogle,
     FetchAllLogs,
@@ -59,6 +71,14 @@ import { BcryptHasher } from '../cryptography/bcrypt-hasher';
     FetchUsers,
     UploadToProfile,
     ReadAllNotifications,
+    CreateCityCouncil,
+    FetchCityCouncils,
+    UpdateCityCouncil,
+    GetCityCouncil,
+    FetchUsersByCityCouncil,
+    FetchCityCouncilsWithoutPaginate,
+    FetchUsersAdmin,
+    AssignResponsibleToCityCouncil,
   ],
   imports: [DatabaseModule, EmailModule, CryptographyModule, SchedulesModule],
 })

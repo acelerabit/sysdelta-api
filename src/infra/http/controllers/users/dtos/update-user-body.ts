@@ -9,14 +9,26 @@ export class UpdateUserBody {
   @IsNotEmpty()
   email: string;
 
+  @IsOptional()
+  @IsNotEmpty()
+  role: 'ADMIN' | 'SECRETARY' | 'COUNCILOR' | 'ASSISTANT' | 'PRESIDENT';
+
   @IsNotEmpty()
   id: string;
 
   @IsOptional()
   @IsNotEmpty()
-  role: 'ADMIN' | 'PRESIDENT' | 'COUNCILOR' | 'SECRETARY' | 'ASSISTANT';
+  acceptNotifications: boolean;
 
   @IsOptional()
   @IsNotEmpty()
-  acceptNotifications: boolean;
+  cpf: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  phone: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  politicalParty: string;
 }

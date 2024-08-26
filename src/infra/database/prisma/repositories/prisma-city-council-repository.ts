@@ -14,6 +14,10 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
       data: {
         id: cityCouncil.id,
         name: cityCouncil.name,
+        city: cityCouncil.city,
+        state: cityCouncil.state,
+        cnpj: cityCouncil.cnpj,
+        active: cityCouncil.active,
       },
     });
   }
@@ -36,10 +40,23 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
     const cityCouncils = await this.prismaService.cityCouncil.findMany({
       take: pagination.itemsPerPage,
       skip: (pagination.page - 1) * pagination.itemsPerPage,
-      // orderBy: {
-      //   createdAt: 'desc',
-      // },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        responsible: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
+
+    return cityCouncils.map(PrismaCityCouncilsMapper.toDomain);
+  }
+
+  async findAllWithoutPaginate(): Promise<CityCouncil[]> {
+    const cityCouncils = await this.prismaService.cityCouncil.findMany();
 
     return cityCouncils.map(PrismaCityCouncilsMapper.toDomain);
   }
@@ -49,6 +66,13 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
       where: {
         id,
       },
+      include: {
+        responsible: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
 
     if (!raw) {
@@ -56,6 +80,41 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
     }
 
     return PrismaCityCouncilsMapper.toDomain(raw);
+  }
+
+  async assignResponsible(cityCouncil: CityCouncil): Promise<void> {
+    const prismaCityCouncil = PrismaCityCouncilsMapper.toPrisma(cityCouncil);
+
+    const cityCouncilFound = await this.prismaService.cityCouncil.findUnique({
+      where: {
+        id: cityCouncil.id,
+      },
+      include: {
+        responsible: true,
+      },
+    });
+
+    if (cityCouncilFound.responsible) {
+      await this.prismaService.responsible.update({
+        where: {
+          id: cityCouncilFound.responsible.id,
+        },
+        data: {
+          userId: cityCouncil.responsible.id,
+        },
+      });
+
+      return;
+    }
+
+    await this.prismaService.responsible.create({
+      data: {
+        userId: prismaCityCouncil.responsible,
+        cityCouncilId: cityCouncil.id,
+      },
+    });
+
+    return;
   }
 
   async update(cityCouncil: CityCouncil): Promise<void> {
@@ -67,12 +126,10 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
       },
       data: {
         name: prismaCityCouncil.name,
-        responsible: {
-          connect: {
-            userId: prismaCityCouncil.responsible,
-            cityCouncilId: prismaCityCouncil.id,
-          },
-        },
+        city: prismaCityCouncil.city,
+        state: prismaCityCouncil.state,
+        cnpj: prismaCityCouncil.cnpj,
+        active: prismaCityCouncil.active,
       },
     });
   }

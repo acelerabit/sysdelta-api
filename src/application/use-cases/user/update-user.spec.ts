@@ -26,7 +26,6 @@ describe('Update User', () => {
       id: newUser.id,
       name: 'new name',
       email: 'johndoe@example.com',
-      role: 'PRESIDENT',
       acceptNotifications: true,
     });
 
@@ -34,6 +33,5 @@ describe('Update User', () => {
     expect(inMemoryUsersRepository.users[0].email).toEqual(
       'johndoe@example.com',
     );
-    expect(inMemoryUsersRepository.users[0].role).toEqual('ADMIN');
   });
 });

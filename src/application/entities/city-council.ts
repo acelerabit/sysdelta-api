@@ -4,8 +4,13 @@ import { User } from './user';
 
 export interface CityCouncilProps {
   name: string;
+  city: string;
+  state: string;
+  cnpj: string;
+  active: boolean;
   councilMembers: User[];
   responsible?: User;
+  createdAt: Date;
 }
 
 export class CityCouncil {
@@ -16,7 +21,8 @@ export class CityCouncil {
     props: Replace<
       CityCouncilProps,
       {
-        // createdAt?: Date;
+        createdAt?: Date;
+        active?: boolean;
         councilMembers?: User[];
       }
     >,
@@ -26,7 +32,9 @@ export class CityCouncil {
     this.props = {
       ...props,
       councilMembers: props.councilMembers ?? [],
-      // createdAt: props.createdAt ?? new Date(),
+      createdAt: props.createdAt ?? new Date(),
+      active: props.active ?? false,
+      responsible: props.responsible ?? null,
     };
   }
 
@@ -40,6 +48,38 @@ export class CityCouncil {
 
   public set name(name: string) {
     this.props.name = name;
+  }
+
+  public get city(): string {
+    return this.props.city;
+  }
+
+  public set city(city: string) {
+    this.props.city = city;
+  }
+
+  public get state(): string {
+    return this.props.state;
+  }
+
+  public set state(state: string) {
+    this.props.state = state;
+  }
+
+  public get cnpj(): string {
+    return this.props.cnpj;
+  }
+
+  public set cnpj(cnpj: string) {
+    this.props.cnpj = cnpj;
+  }
+
+  public get active(): boolean {
+    return this.props.active;
+  }
+
+  public set active(active: boolean) {
+    this.props.active = active;
   }
 
   public get councilMembers(): User[] {
@@ -58,19 +98,20 @@ export class CityCouncil {
     this.props.responsible = responsible;
   }
 
-  // get createdAt() {
-  //   return this.props.createdAt;
-  // }
+  get createdAt() {
+    return this.props.createdAt;
+  }
 
-  // set createdAt(createdAt: Date) {
-  //   this.props.createdAt = createdAt;
-  // }
+  set createdAt(createdAt: Date) {
+    this.props.createdAt = createdAt;
+  }
 
   static create(
     props: Replace<
       CityCouncilProps,
       {
-        // createdAt?: Date
+        createdAt?: Date;
+        active?: boolean;
         councilMembers?: User[];
       }
     >,

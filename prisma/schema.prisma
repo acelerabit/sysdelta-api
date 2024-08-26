@@ -19,12 +19,20 @@ enum Role {
 }
 
 model CityCouncil {
-  id   String @id @default(uuid())
-  name String
+  id    String @id @default(uuid())
+  name  String
+  city  String
+  state String
+  cnpj  String @unique
 
   councilMembers User[]
 
   responsible Responsible?
+
+  active Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("city_council")
 }
@@ -37,6 +45,9 @@ model User {
   password            String?
   avatarUrl           String? @map("avatar_url")
   acceptNotifications Boolean @default(false) @map("accept_notifications")
+  phone               String? @unique
+  cpf                 String? @unique
+  politicalParty      String? @map("political_party")
 
   role Role @default(ASSISTANT)
 
@@ -49,6 +60,7 @@ model User {
   affiliatedCouncilId String?
 
   responsible Responsible?
+  active      Boolean      @default(false)
 
   @@index([email])
   @@map("users")

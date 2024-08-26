@@ -6,8 +6,11 @@ export interface UpdateUserRequest {
   id: string;
   name: string;
   email: string;
-  role: 'ADMIN' | 'PRESIDENT' | 'COUNCILOR' | 'SECRETARY' | 'ASSISTANT';
+  cpf: string;
+  phone: string;
+  politicalParty: string;
   acceptNotifications: boolean;
+  role: 'ADMIN' | 'SECRETARY' | 'COUNCILOR' | 'ASSISTANT' | 'PRESIDENT';
 }
 
 export interface UpdateUserResponse {
@@ -22,8 +25,11 @@ export class UpdateUser {
     id,
     email,
     name,
-    role,
     acceptNotifications,
+    cpf,
+    politicalParty,
+    phone,
+    role,
   }: UpdateUserRequest): Promise<UpdateUserResponse> {
     const user = await this.usersRepository.findById(id);
 
@@ -44,12 +50,24 @@ export class UpdateUser {
       updates.name = name;
     }
 
-    if (typeof acceptNotifications === 'boolean') {
-      updates.acceptNotifications = acceptNotifications;
+    if (cpf) {
+      updates.cpf = cpf;
+    }
+
+    if (phone) {
+      updates.phone = phone;
     }
 
     if (role) {
       updates.role = role;
+    }
+
+    if (politicalParty) {
+      updates.politicalParty = politicalParty;
+    }
+
+    if (typeof acceptNotifications === 'boolean') {
+      updates.acceptNotifications = acceptNotifications;
     }
 
     Object.assign(user, updates);

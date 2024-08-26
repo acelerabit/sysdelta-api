@@ -1,6 +1,8 @@
+import { FetchUsersAdmin } from './../../../../application/use-cases/user/fetch-admin-users';
+import { FetchUsers } from '@/application/use-cases/user/fetch-users';
+import { GetUser } from '@/application/use-cases/user/get-user';
+import { GetUserByEmail } from '@/application/use-cases/user/get-user-by-email';
 import { UpdateUser } from '@/application/use-cases/user/update-user';
-import { EMAIL_QUEUE } from '@/common/constants';
-import { InjectQueue } from '@nestjs/bull';
 import {
   Body,
   Controller,
@@ -10,43 +12,65 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { Queue } from 'bull';
 import { CreateUser } from 'src/application/use-cases/user/create-user';
-import { JwtUserAuthGuard } from 'src/infra/auth/jwt.guard';
 import { CreateUserBody } from './dtos/create-user-body';
-import { UpdateUserBody } from './dtos/update-user-body';
-import { ScheduleService } from '@/infra/schedules/schedules.service';
-import { GetUser } from '@/application/use-cases/user/get-user';
-import { GetUserBody } from './dtos/get-user-body';
 import { GetUserByEmailBody } from './dtos/get-user-by-email';
-import { GetUserByEmail } from '@/application/use-cases/user/get-user-by-email';
-import { FetchUsers } from '@/application/use-cases/user/fetch-users';
+import { UpdateUserBody } from './dtos/update-user-body';
 import { UsersPresenters } from './presenters/user.presenter';
+import { Auth } from '@/infra/decorators/auth.decorator';
+import { Role } from '@prisma/client';
+import { FetchUsersByCityCouncil } from '@/application/use-cases/user/fetch-users-by-city-council';
+import { CreateUserAdminBody } from './dtos/create-user-admin-body';
+import { CreateUserAdmin } from '@/application/use-cases/user/create-user-admin';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private createUser: CreateUser,
+    private createUserAdmin: CreateUserAdmin,
     private getUser: GetUser,
     private getUserByEmail: GetUserByEmail,
     private updateUser: UpdateUser,
     private fetchUsers: FetchUsers,
-    private scheduleService: ScheduleService,
-    @InjectQueue(EMAIL_QUEUE) private sendMailQueue: Queue,
+    private fetchUsersAdmin: FetchUsersAdmin,
+    private fetchUsersByCityCouncil: FetchUsersByCityCouncil,
   ) {}
 
   // @UseInterceptors(interceptor)
   @Post()
-  async create(@Body() body: CreateUserBody) {
-    const { email, password, role, name } = body;
+  async create(@Body() body: CreateUserBody, @Req() req: any) {
+    const { email, role, name, cityCouncilId, phone, cpf, politicalParty } =
+      body;
 
     const { user } = await this.createUser.execute({
+      requestOwnerId: req.userId,
       name,
       email,
-      password,
       role,
+      cityCouncilId: cityCouncilId,
+      phone,
+      cpf,
+      politicalParty,
+    });
+
+    return {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      id: user.id,
+    };
+  }
+
+  @Auth(Role.ADMIN)
+  @Post('/admin')
+  async createAdmin(@Body() body: CreateUserAdminBody, @Req() req: any) {
+    const { email, name } = body;
+
+    const { user } = await this.createUserAdmin.execute({
+      requestOwnerId: req.userId,
+      name,
+      email,
     });
 
     return {
@@ -71,6 +95,21 @@ export class UsersController {
     return users.map(UsersPresenters.toHTTP);
   }
 
+  @Auth(Role.ADMIN)
+  @Get('/admin')
+  async listAdmins(@Query() query: { page?: string; itemsPerPage?: string }) {
+    const { page, itemsPerPage } = query;
+
+    const { users } = await this.fetchUsersAdmin.execute({
+      pagination: {
+        itemsPerPage: Number(itemsPerPage),
+        page: Number(page),
+      },
+    });
+
+    return users.map(UsersPresenters.toHTTP);
+  }
+
   @Get('/:id')
   async get(@Param('id') id: string) {
     const { user } = await this.getUser.execute({
@@ -78,6 +117,16 @@ export class UsersController {
     });
 
     return UsersPresenters.toHTTP(user);
+  }
+
+  @Auth(Role.ADMIN)
+  @Get('/city-council/:id')
+  async fetchUsersFromCityCouncil(@Param('id') id: string) {
+    const { users } = await this.fetchUsersByCityCouncil.execute({
+      cityCouncilId: id,
+    });
+
+    return users.map(UsersPresenters.toHTTP);
   }
 
   @Post('/by-email')
@@ -93,25 +142,28 @@ export class UsersController {
 
   @Put('/update')
   async update(@Body() body: UpdateUserBody) {
-    const { email, id, role, name, acceptNotifications } = body;
+    const {
+      email,
+      id,
+      name,
+      acceptNotifications,
+      phone,
+      cpf,
+      politicalParty,
+      role,
+    } = body;
 
     const { user } = await this.updateUser.execute({
       name,
       email,
-      role,
       id,
       acceptNotifications,
+      phone,
+      cpf,
+      politicalParty,
+      role,
     });
 
     return UsersPresenters.toHTTP(user);
   }
-
-  // @UseGuards(JwtUserAuthGuard)
-  // @Get('/teste/send-email')
-  // async sendMail(@Req() req: any) {
-  //   console.log('Here', req?.userId);
-  //   // await this.sendMailQueue.add('sendMail-job', { email: 'teste@gmail.com' });
-
-  //   return;
-  // }
 }

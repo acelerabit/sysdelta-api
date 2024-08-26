@@ -19,6 +19,10 @@ export class PrismaUsersRepository implements UsersRepository {
         createdAt: user.createdAt,
         role: user.role,
         acceptNotifications: user.acceptNotifications,
+        cpf: user.cpf,
+        phone: user.phone,
+        politicalParty: user.politicalParty,
+        affiliatedCouncilId: user.affiliatedCouncilId ?? null,
       },
     });
   }
@@ -44,6 +48,28 @@ export class PrismaUsersRepository implements UsersRepository {
       orderBy: {
         createdAt: 'desc',
       },
+      include: {
+        responsible: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return users.map(PrismaUsersMapper.toDomain);
+  }
+
+  async findManyAdmin(pagination: PaginationParams): Promise<User[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        role: 'ADMIN',
+      },
+      take: pagination.itemsPerPage,
+      skip: (pagination.page - 1) * pagination.itemsPerPage,
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     return users.map(PrismaUsersMapper.toDomain);
@@ -55,10 +81,23 @@ export class PrismaUsersRepository implements UsersRepository {
     return users.map(PrismaUsersMapper.toDomain);
   }
 
+  async findManyByCityCouncil(cityCouncilId: string): Promise<User[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        affiliatedCouncilId: cityCouncilId,
+      },
+    });
+
+    return users.map(PrismaUsersMapper.toDomain);
+  }
+
   async findById(id: string): Promise<User> {
     const raw = await this.prismaService.user.findUnique({
       where: {
         id,
+      },
+      include: {
+        affiliatedCouncil: true,
       },
     });
 
