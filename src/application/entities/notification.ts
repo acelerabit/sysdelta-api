@@ -69,5 +69,6 @@ export class Notification {
     const notification = new Notification(props, id);
 
     return notification;
+    
   }
 }
