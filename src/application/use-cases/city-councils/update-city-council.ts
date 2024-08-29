@@ -3,7 +3,7 @@ import { CityCouncilsRepository } from '@/application/repositories/city-council-
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 export interface UpdateCityCouncilRequest {
-  id: string;
+  cityCouncilId: string;
   name: string;
   city: string;
   state: string;
@@ -19,13 +19,15 @@ export class UpdateCityCouncil {
   constructor(private cityCouncilsRepository: CityCouncilsRepository) {}
 
   async execute({
-    id,
+    cityCouncilId,
     name,
     city,
     state,
     cnpj,
   }: UpdateCityCouncilRequest): Promise<UpdateCityCouncilResponse> {
-    const cityCouncil = await this.cityCouncilsRepository.findById(id);
+    const cityCouncil = await this.cityCouncilsRepository.findById(
+      cityCouncilId,
+    );
 
     if (!cityCouncil) {
       throw new BadRequestException('Não foi possivel editar a câmara', {

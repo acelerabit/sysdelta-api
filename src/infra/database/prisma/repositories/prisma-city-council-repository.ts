@@ -134,6 +134,16 @@ export class PrismaCityCouncilsRepository implements CityCouncilsRepository {
     });
   }
 
+  async delete(id: string): Promise<void> {
+    await this.prismaService.cityCouncil.delete({
+      where: {
+        id,
+      },
+    });
+
+    return;
+  }
+
   async count(): Promise<number> {
     const count = await this.prismaService.cityCouncil.count();
 

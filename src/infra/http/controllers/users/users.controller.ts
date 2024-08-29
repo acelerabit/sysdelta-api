@@ -6,6 +6,7 @@ import { UpdateUser } from '@/application/use-cases/user/update-user';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -23,6 +24,8 @@ import { Role } from '@prisma/client';
 import { FetchUsersByCityCouncil } from '@/application/use-cases/user/fetch-users-by-city-council';
 import { CreateUserAdminBody } from './dtos/create-user-admin-body';
 import { CreateUserAdmin } from '@/application/use-cases/user/create-user-admin';
+import { FetchUsersByCityCouncilWithoutPaginate } from '@/application/use-cases/user/fetch-users-by-city-council-without-paginate';
+import { DeleteUser } from '../../../../application/use-cases/user/delete-user';
 
 @Controller('users')
 export class UsersController {
@@ -35,6 +38,8 @@ export class UsersController {
     private fetchUsers: FetchUsers,
     private fetchUsersAdmin: FetchUsersAdmin,
     private fetchUsersByCityCouncil: FetchUsersByCityCouncil,
+    private fetchUsersByCityCouncilWithoutPaginate: FetchUsersByCityCouncilWithoutPaginate,
+    private deleteUser: DeleteUser,
   ) {}
 
   // @UseInterceptors(interceptor)
@@ -119,12 +124,64 @@ export class UsersController {
     return UsersPresenters.toHTTP(user);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth(Role.ADMIN, Role.PRESIDENT)
   @Get('/city-council/:id')
-  async fetchUsersFromCityCouncil(@Param('id') id: string) {
+  async fetchUsersFromCityCouncil(
+    @Param('id') id: string,
+    @Query()
+    query: {
+      page?: string;
+      itemsPerPage?: string;
+      name?: string;
+      email?: string;
+      orderByField?: 'name' | 'email' | 'createdAt';
+      orderDirection?: 'desc' | 'asc';
+      plan?: string;
+      role?: 'ADMIN' | 'PRESIDENT' | 'SECRETARY' | 'COUNCILOR' | 'ASSISTANT';
+      startDate?: Date;
+      endDate?: Date;
+    },
+  ) {
+    const {
+      name,
+      email,
+      orderByField,
+      orderDirection,
+      page,
+      itemsPerPage,
+      role,
+      startDate,
+      endDate,
+    } = query;
+
     const { users } = await this.fetchUsersByCityCouncil.execute({
       cityCouncilId: id,
+      name,
+      email,
+      orderByField,
+      orderDirection,
+      filterParams: {
+        role,
+        startDate,
+        endDate,
+      },
+      pagination: {
+        itemsPerPage: Number(itemsPerPage),
+        page: Number(page),
+      },
     });
+
+    return users.map(UsersPresenters.toHTTP);
+  }
+
+  @Auth(Role.ADMIN, Role.PRESIDENT)
+  @Get('/city-council/without-paginate/:id')
+  async fetchUsersFromCityCouncilWithoutPaginate(@Param('id') id: string) {
+    const { users } = await this.fetchUsersByCityCouncilWithoutPaginate.execute(
+      {
+        cityCouncilId: id,
+      },
+    );
 
     return users.map(UsersPresenters.toHTTP);
   }
@@ -165,5 +222,14 @@ export class UsersController {
     });
 
     return UsersPresenters.toHTTP(user);
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    await this.deleteUser.execute({
+      id,
+    });
+
+    return;
   }
 }

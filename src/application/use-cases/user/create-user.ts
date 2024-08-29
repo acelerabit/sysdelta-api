@@ -59,6 +59,24 @@ export class CreateUser {
       });
     }
 
+    const userWithSamePhone = await this.usersRepository.findByPhone(phone);
+
+    if (userWithSamePhone) {
+      throw new BadRequestException(`Usuário com telefone já existe`, {
+        cause: new Error(`Usuário com telefone já existe`),
+        description: `Usuário com telefone já existe`,
+      });
+    }
+
+    const userWithSameCpf = await this.usersRepository.findByCpf(cpf);
+
+    if (userWithSameCpf) {
+      throw new BadRequestException(`Usuário com esse CPF já existe`, {
+        cause: new Error(`Usuário com esse CPF já existe`),
+        description: `Usuário com esse CPF já existe`,
+      });
+    }
+
     const cityCouncil = await this.cityCouncilsRepository.findById(
       cityCouncilId,
     );
@@ -118,7 +136,7 @@ export class CreateUser {
       expiresIn,
     );
 
-    await this.sendMailQueue.add('sendMail-job', {
+    this.sendMailQueue.add('sendMail-job', {
       email: email,
       subject: 'Redefinição de senha',
       templateName: 'redefine-temporary-password.hbs',

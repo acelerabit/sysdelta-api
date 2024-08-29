@@ -6,6 +6,7 @@ import { Auth } from '@/infra/decorators/auth.decorator';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -19,6 +20,7 @@ import { UpdateCityCouncilBody } from './dtos/update-city-council-body';
 import { CityCouncilsPresenters } from './presenters/create-city-council.presenter';
 import { CreateCityCouncilBody } from './dtos/create-city-council-body';
 import { FetchCityCouncilsWithoutPaginate } from '@/application/use-cases/city-councils/fetch-city-councils-without-paginate';
+import { DeleteCityCouncil } from '@/application/use-cases/city-councils/delete-city-council';
 
 @Controller('city-councils')
 export class CityCouncilsController {
@@ -29,6 +31,7 @@ export class CityCouncilsController {
     private assignResponsibleToCityCouncil: AssignResponsibleToCityCouncil,
     private updateCityCouncil: UpdateCityCouncil,
     private getCityCouncil: GetCityCouncil,
+    private deleteCityCouncil: DeleteCityCouncil,
   ) {}
 
   @Auth(Role.ADMIN)
@@ -102,8 +105,11 @@ export class CityCouncilsController {
   }
 
   @Auth(Role.ADMIN)
-  @Put('/update')
-  async update(@Body() body: UpdateCityCouncilBody, @Req() req: any) {
+  @Put('/update/:cityCouncilId')
+  async update(
+    @Param('cityCouncilId') cityCouncilId: string,
+    @Body() body: UpdateCityCouncilBody,
+  ) {
     const { name, city, state, cnpj } = body;
 
     const { cityCouncil } = await this.updateCityCouncil.execute({
@@ -111,9 +117,19 @@ export class CityCouncilsController {
       city,
       state,
       cnpj,
-      id: req.userId,
+      cityCouncilId,
     });
 
     return CityCouncilsPresenters.toHTTP(cityCouncil);
+  }
+
+  @Auth(Role.ADMIN)
+  @Delete('/:cityCouncilId')
+  async delete(@Param('cityCouncilId') cityCouncilId: string) {
+    await this.deleteCityCouncil.execute({
+      id: cityCouncilId,
+    });
+
+    return;
   }
 }

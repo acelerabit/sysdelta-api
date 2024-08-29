@@ -8,6 +8,7 @@ export abstract class CityCouncilsRepository {
   abstract count(): Promise<number>;
   abstract findByName(name: string): Promise<CityCouncil | null>;
   abstract findById(id: string): Promise<CityCouncil | null>;
+  abstract delete(id: string): Promise<void>;
   abstract update(cityCouncil: CityCouncil): Promise<void>;
   abstract assignResponsible(cityCouncil: CityCouncil): Promise<void>;
 }

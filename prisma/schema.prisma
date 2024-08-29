@@ -56,7 +56,7 @@ model User {
 
   notifications Notification[]
 
-  affiliatedCouncil   CityCouncil? @relation(fields: [affiliatedCouncilId], references: [id])
+  affiliatedCouncil   CityCouncil? @relation(fields: [affiliatedCouncilId], references: [id], onDelete: Cascade)
   affiliatedCouncilId String?
 
   responsible Responsible?
@@ -69,10 +69,10 @@ model User {
 model Responsible {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 
-  cityCouncil   CityCouncil @relation(fields: [cityCouncilId], references: [id])
+  cityCouncil   CityCouncil @relation(fields: [cityCouncilId], references: [id], onDelete: Cascade)
   cityCouncilId String      @unique
 }
 

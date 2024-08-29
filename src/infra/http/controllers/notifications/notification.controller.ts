@@ -14,7 +14,7 @@ export class NotificationController {
     private readAllNotifications: ReadAllNotifications,
   ) {}
 
-  @Auth(Role.ADMIN, Role.ASSISTANT)
+  @Auth()
   @Get('/:userId')
   async fetchUnreads(@Param('userId') userId: string) {
     const { notifications } = await this.fetchAllUnreadNotifications.execute({
@@ -24,7 +24,7 @@ export class NotificationController {
     return { notifications: notifications.map(NotificationPresenter.toHTTP) };
   }
 
-  @Auth(Role.ADMIN, Role.ASSISTANT)
+  @Auth()
   @Get('/read/:id')
   async readMessage(@Param('id') id: string) {
     await this.readNotification.execute({
@@ -34,7 +34,7 @@ export class NotificationController {
     return;
   }
 
-  @Auth(Role.ADMIN, Role.ASSISTANT)
+  @Auth()
   @Get('/readAll/:userId')
   async readAllMessages(@Param('userId') userId: string) {
     await this.readAllNotifications.execute({
