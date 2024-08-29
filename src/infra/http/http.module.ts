@@ -42,6 +42,8 @@ import { AssignResponsibleToCityCouncil } from '@/application/use-cases/city-cou
 import { FetchUsersByCityCouncilWithoutPaginate } from '@/application/use-cases/user/fetch-users-by-city-council-without-paginate';
 import { DeleteCityCouncil } from '@/application/use-cases/city-councils/delete-city-council';
 import { DeleteUser } from '@/application/use-cases/user/delete-user';
+import { ActivateUser } from '@/application/use-cases/user/activate-user';
+import { InactivateUser } from '@/application/use-cases/user/inactivate-user';
 
 @Module({
   controllers: [
@@ -85,6 +87,8 @@ import { DeleteUser } from '@/application/use-cases/user/delete-user';
     FetchUsersByCityCouncilWithoutPaginate,
     DeleteCityCouncil,
     DeleteUser,
+    ActivateUser,
+    InactivateUser,
   ],
   imports: [DatabaseModule, EmailModule, CryptographyModule, SchedulesModule],
 })

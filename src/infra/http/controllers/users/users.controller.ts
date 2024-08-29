@@ -9,6 +9,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -26,6 +27,8 @@ import { CreateUserAdminBody } from './dtos/create-user-admin-body';
 import { CreateUserAdmin } from '@/application/use-cases/user/create-user-admin';
 import { FetchUsersByCityCouncilWithoutPaginate } from '@/application/use-cases/user/fetch-users-by-city-council-without-paginate';
 import { DeleteUser } from '../../../../application/use-cases/user/delete-user';
+import { ActivateUser } from '@/application/use-cases/user/activate-user';
+import { InactivateUser } from '@/application/use-cases/user/inactivate-user';
 
 @Controller('users')
 export class UsersController {
@@ -40,6 +43,8 @@ export class UsersController {
     private fetchUsersByCityCouncil: FetchUsersByCityCouncil,
     private fetchUsersByCityCouncilWithoutPaginate: FetchUsersByCityCouncilWithoutPaginate,
     private deleteUser: DeleteUser,
+    private activateUser: ActivateUser,
+    private inactivateUser: InactivateUser,
   ) {}
 
   // @UseInterceptors(interceptor)
@@ -192,6 +197,26 @@ export class UsersController {
 
     const { user } = await this.getUserByEmail.execute({
       email,
+    });
+
+    return UsersPresenters.toHTTP(user);
+  }
+
+  @Auth(Role.ADMIN, Role.PRESIDENT)
+  @Patch('/activate/:id')
+  async activate(@Param('id') id: string) {
+    const { user } = await this.activateUser.execute({
+      id,
+    });
+
+    return UsersPresenters.toHTTP(user);
+  }
+
+  @Auth(Role.ADMIN, Role.PRESIDENT)
+  @Patch('/inactivate/:id')
+  async inactivate(@Param('id') id: string) {
+    const { user } = await this.inactivateUser.execute({
+      id,
     });
 
     return UsersPresenters.toHTTP(user);

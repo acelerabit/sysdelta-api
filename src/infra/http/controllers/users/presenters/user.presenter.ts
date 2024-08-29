@@ -13,6 +13,7 @@ export class UsersPresenters {
       cpf: user.cpf,
       politicalParty: user.politicalParty,
       createdAt: user.createdAt,
+      active: user.active,
       affiliatedCouncil: user.affiliatedCouncil
         ? {
             name: user.affiliatedCouncil.name,

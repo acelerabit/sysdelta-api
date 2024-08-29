@@ -243,6 +243,32 @@ export class PrismaUsersRepository implements UsersRepository {
     });
   }
 
+  async inactivate(id: string): Promise<User | null> {
+    const raw = await this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: {
+        active: false,
+      },
+    });
+
+    return PrismaUsersMapper.toDomain(raw);
+  }
+
+  async activate(id: string): Promise<User | null> {
+    const raw = await this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: {
+        active: true,
+      },
+    });
+
+    return PrismaUsersMapper.toDomain(raw);
+  }
+
   async count(): Promise<number> {
     const count = await this.prismaService.user.count();
 
