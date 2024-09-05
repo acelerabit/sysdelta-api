@@ -21,14 +21,11 @@ export class UpdateUserBody {
   acceptNotifications: boolean;
 
   @IsOptional()
-  @IsNotEmpty()
   cpf: string;
 
   @IsOptional()
-  @IsNotEmpty()
   phone: string;
 
   @IsOptional()
-  @IsNotEmpty()
   politicalParty: string;
 }
