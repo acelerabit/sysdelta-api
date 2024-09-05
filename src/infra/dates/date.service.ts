@@ -11,6 +11,12 @@ export class DateService {
     return dayjs(date).toISOString();
   }
 
+  formatToPrismaDateTime(inputDate: string | Date) {
+    const formattedDate = dayjs(inputDate).format('YYYY-MM-DDTHH:mm:ssZ');
+
+    return formattedDate;
+  }
+
   // Método para verificar se a data passada já ocorreu
   isDatePassed(date: string | Date): boolean {
     return dayjs(date).isBefore(dayjs(), 'day');

@@ -7,8 +7,11 @@ import { User } from './../../entities/user';
 import { CreateUser } from './../user/create-user';
 import { LoginUser } from './login-user';
 import { randomUUID } from 'crypto';
+import { CityCouncil } from '@/application/entities/city-council';
+import { InMemoryCityCouncilRepository } from 'test/repositories/city-council/in-memory-city-council-repository';
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
+let inMemoryCityCouncilRepository;
 let loginUser: LoginUser;
 let fakeHasher: FakeHasher;
 let fakeEncrypter: FakeEncrypter;
@@ -22,22 +25,23 @@ describe('Authenticate User', () => {
     };
   });
 
-  const mock = vi.fn().mockImplementation(() => {
+  const mockHash = vi.fn().mockImplementation(() => {
     return {
-      createCustomer: vi.fn().mockReturnValue({
-        customer: {
-          id: randomUUID(),
-        },
-      }),
+      hash: vi.fn().mockResolvedValue('123-hashed'),
+      compare: vi.fn().mockResolvedValue(true),
     };
   });
 
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository();
-    fakeHasher = new FakeHasher();
+    inMemoryCityCouncilRepository = new InMemoryCityCouncilRepository();
+    fakeHasher = mockHash();
     fakeEncrypter = new FakeEncrypter();
     jwt = mockJwt();
-    const billingServiceMock = mock();
+
+    const mockSendMailQueue = {
+      add: vi.fn(),
+    } as any;
 
     loginUser = new LoginUser(
       inMemoryUsersRepository,
@@ -48,20 +52,50 @@ describe('Authenticate User', () => {
     createUser = new CreateUser(
       inMemoryUsersRepository,
       fakeHasher,
-      billingServiceMock,
+      fakeEncrypter,
+      inMemoryCityCouncilRepository,
+      mockSendMailQueue,
     );
   });
 
   it('should be able login with existent user', async () => {
-    const newUser = new User({
-      name: 'user-test',
-      email: 'email@test.com',
+    const cityCouncil = CityCouncil.create({
+      city: 'city-test',
+      cnpj: '123',
+      name: 'city test',
+      state: 'state test',
+    });
+
+    inMemoryCityCouncilRepository.cityCouncils.push(cityCouncil);
+
+    const admin = User.create({
+      name: 'admin-test',
+      email: 'admin@test.com',
       password: '123',
-      role: 'USER',
+      role: 'ADMIN',
       createdAt: new Date(),
     });
 
-    await createUser.execute(newUser);
+    inMemoryUsersRepository.users.push(admin);
+
+    const newUser = User.create({
+      name: 'user-test',
+      email: 'email@test.com',
+      password: '123',
+      role: 'ASSISTANT',
+      createdAt: new Date(),
+    });
+
+    const userResponse = await createUser.execute({
+      cpf: '123',
+      email: newUser.email,
+      name: newUser.name,
+      phone: '123',
+      politicalParty: 'teste',
+      role: 'ASSISTANT',
+      cityCouncilId: cityCouncil.id,
+      requestOwnerId: admin.id,
+    });
 
     const { accessToken } = await loginUser.execute({
       email: 'email@test.com',

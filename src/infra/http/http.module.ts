@@ -44,6 +44,33 @@ import { DeleteCityCouncil } from '@/application/use-cases/city-councils/delete-
 import { DeleteUser } from '@/application/use-cases/user/delete-user';
 import { ActivateUser } from '@/application/use-cases/user/activate-user';
 import { InactivateUser } from '@/application/use-cases/user/inactivate-user';
+import { CreateOffice } from '@/application/use-cases/office/create-office';
+import { UpdateOffice } from '@/application/use-cases/office/update-office';
+import { GetOffice } from '@/application/use-cases/office/get-office';
+import { FetchOffice } from '@/application/use-cases/office/fetch-office';
+import { DeleteOffice } from '@/application/use-cases/office/delete-office';
+import { CreateOrderDay } from '@/application/use-cases/order-of-the-day/create-order-day';
+import { UpdateOrderDay } from '@/application/use-cases/order-of-the-day/update-order-day';
+import { FetchOrderDay } from '@/application/use-cases/order-of-the-day/fetch-order-day';
+import { GetOrderDay } from '@/application/use-cases/order-of-the-day/get-order-day';
+import { DeleteOrderDay } from '@/application/use-cases/order-of-the-day/delete-order-day';
+import { CreateSession } from '@/application/use-cases/session/create-session';
+import { UpdateSession } from '@/application/use-cases/session/update-session';
+import { FetchSession } from '@/application/use-cases/session/fetch-sessions';
+import { GetSession } from '@/application/use-cases/session/get-session';
+import { DeleteSession } from '@/application/use-cases/session/delete-session';
+import { CreateLegislativeMatter } from '@/application/use-cases/legislative-matter/create-legislative-matter';
+import { UpdateLegislativeMatter } from '@/application/use-cases/legislative-matter/update-legislative-matter';
+import { FetchLegislativeMatter } from '@/application/use-cases/legislative-matter/fetch-legislative-matter';
+import { FetchLegislativeMatterFromSession } from '@/application/use-cases/legislative-matter/fetch-legislative-matter-from-session';
+import { DeleteLegislativeMatter } from '@/application/use-cases/legislative-matter/delete-legislative-matter';
+import { OfficeController } from './controllers/office/office.controller';
+import { OrderDayController } from './controllers/order-day/order-day.controller';
+import { SessionController } from './controllers/session/session.controller';
+import { LegislativeMatterController } from './controllers/legislative-matter/legislative-matter.controller';
+import { GetLegislativeMatter } from '@/application/use-cases/legislative-matter/get-legislative-matter';
+import { GetOfficeBySession } from '@/application/use-cases/office/get-office-by-session';
+import { GetOrderDayBySession } from '@/application/use-cases/order-of-the-day/get-order-day-by-session';
 
 @Module({
   controllers: [
@@ -55,6 +82,10 @@ import { InactivateUser } from '@/application/use-cases/user/inactivate-user';
     UploadController,
     DashboardController,
     CityCouncilsController,
+    OfficeController,
+    OrderDayController,
+    SessionController,
+    LegislativeMatterController,
   ],
   providers: [
     CreateUser,
@@ -89,6 +120,30 @@ import { InactivateUser } from '@/application/use-cases/user/inactivate-user';
     DeleteUser,
     ActivateUser,
     InactivateUser,
+    CreateOffice,
+    UpdateOffice,
+    GetOffice,
+    FetchOffice,
+    DeleteOffice,
+    GetOfficeBySession,
+    CreateOrderDay,
+    UpdateOrderDay,
+    FetchOrderDay,
+    GetOrderDayBySession,
+    GetOrderDay,
+    DeleteOrderDay,
+    CreateSession,
+    UpdateSession,
+    FetchSession,
+    GetSession,
+    DeleteSession,
+    CreateLegislativeMatter,
+    UpdateLegislativeMatter,
+    FetchLegislativeMatter,
+    FetchLegislativeMatterFromSession,
+    UpdateLegislativeMatter,
+    DeleteLegislativeMatter,
+    GetLegislativeMatter,
   ],
   imports: [DatabaseModule, EmailModule, CryptographyModule, SchedulesModule],
 })

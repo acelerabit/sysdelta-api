@@ -31,8 +31,9 @@ model CityCouncil {
 
   active Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
 
   @@map("city_council")
 }
@@ -62,6 +63,11 @@ model User {
   responsible Responsible?
   active      Boolean      @default(false)
 
+  legislativeMatter   LegislativeMatter? @relation("councilors_who_voted", fields: [legislativeMatterId], references: [id])
+  legislativeMatterId String?
+
+  legislativeMatters LegislativeMatter[]
+
   @@index([email])
   @@map("users")
 }
@@ -74,6 +80,111 @@ model Responsible {
 
   cityCouncil   CityCouncil @relation(fields: [cityCouncilId], references: [id], onDelete: Cascade)
   cityCouncilId String      @unique
+}
+
+enum SessionTypes {
+  ORDINARY
+}
+
+enum SessionStatus {
+  SCHEDULED
+  STARTED
+  SUSPENDED
+  POSTPONED
+  CLOSED
+  CANCELED
+}
+
+model Session {
+  id String @id @default(uuid())
+
+  legislature        String
+  legislativeSession String
+  type               SessionTypes
+  numberSession      Int
+  openingDateTime    DateTime
+  closingDateTime    DateTime
+  sessionStatus      SessionStatus
+
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  office            Office?
+  orderDay          OrderDay?
+  legislativeMatter LegislativeMatter[]
+
+  cityCouncil   CityCouncil @relation(fields: [cityCouncilId], references: [id])
+  cityCouncilId String
+}
+
+model OrderDay {
+  id String @id @default(uuid())
+
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  summary   String
+
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId String  @unique
+
+  legislativeMatters LegislativeMatter[]
+}
+
+model Office {
+  id String @id @default(uuid())
+
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  summary   String
+
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId String  @unique
+
+  legislativeMatters LegislativeMatter[]
+}
+
+enum VotingType {
+  SECRET
+  NOMINAL
+}
+
+enum LegislativeMatterStatus {
+  PUBLISHED
+  DISCUSSED
+  VOTED_ON
+  ADOPTED
+  REJECTED
+  POSTPONED
+  WITHDRAW
+}
+
+model LegislativeMatter {
+  id String @id @default(uuid())
+
+  type             String
+  summary          String
+  presentationDate DateTime
+  code             Int
+  title            String
+  votingType       VotingType
+  status           LegislativeMatterStatus
+
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  office   Office? @relation(fields: [officeId], references: [id])
+  officeId String?
+
+  orderDay   OrderDay? @relation(fields: [orderDayId], references: [id])
+  orderDayId String?
+
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  councilorsWhoVoted User[] @relation("councilors_who_voted")
 }
 
 model Notification {
