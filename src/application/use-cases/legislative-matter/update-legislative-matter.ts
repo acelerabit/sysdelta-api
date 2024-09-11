@@ -10,11 +10,11 @@ interface RequestLegislativeMatterProps {
   type: string;
   summary: string;
   presentationDate: Date;
-  code: number;
+  code: string;
   title: string;
   votingType: VotingType;
   status: Status;
-  authorId: string;
+  authors: string;
   legislativeMatterId: string;
 }
 
@@ -28,7 +28,7 @@ export class UpdateLegislativeMatter {
     const {
       summary,
       legislativeMatterId,
-      authorId,
+      authors,
       presentationDate,
       status,
       title,
@@ -52,8 +52,8 @@ export class UpdateLegislativeMatter {
       updates.summary = summary;
     }
 
-    if (authorId) {
-      updates.authorId = authorId;
+    if (authors) {
+      updates.authors = authors;
     }
 
     if (presentationDate) {

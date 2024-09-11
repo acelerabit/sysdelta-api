@@ -15,6 +15,7 @@ export class LegislativeMattersPresenters {
       status: legislativeMatter.status,
       sessionId: legislativeMatter.sessionId,
       authorId: legislativeMatter.authorId,
+      authors: legislativeMatter.authors,
       author: legislativeMatter.author,
       councilorsWhoVoted: legislativeMatter.councilorsWhoVoted,
     };

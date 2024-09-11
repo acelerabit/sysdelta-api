@@ -1,12 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import { Replace } from './../../helpers/Replace';
 import { LegislativeMatter } from './legislative-matter';
+import { User } from './user';
 
 export interface OrderDayProps {
   createdAt: Date;
   updatedAt?: Date;
   summary: string;
   legislativeMatters: LegislativeMatter[];
+
+  absentCouncilors?: User[];
+  presentCouncilors?: User[];
   sessionId: string;
 }
 
@@ -48,6 +52,22 @@ export class OrderDay {
 
   set summary(summary: string) {
     this.props.summary = summary;
+  }
+
+  get absentCouncilors() {
+    return this.props.absentCouncilors;
+  }
+
+  set absentCouncilors(absentCouncilors: User[]) {
+    this.props.absentCouncilors = absentCouncilors;
+  }
+
+  get presentCouncilors() {
+    return this.props.presentCouncilors;
+  }
+
+  set presentCouncilors(presentCouncilors: User[]) {
+    this.props.presentCouncilors = presentCouncilors;
   }
 
   get sessionId() {

@@ -1,5 +1,5 @@
 import { Status, VotingType } from '@/application/entities/legislative-matter';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateLegislativeMatterBody {
   @IsNotEmpty()
@@ -12,14 +12,15 @@ export class CreateLegislativeMatterBody {
   presentationDate: Date;
 
   @IsNotEmpty()
-  code: number;
+  code: string;
 
   @IsNotEmpty()
   title: string;
 
   @IsNotEmpty()
-  votingType: VotingType;
+  @IsOptional()
+  votingType?: VotingType;
 
   @IsNotEmpty()
-  authorId: string;
+  authors: string;
 }

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { Attachment } from './attachment';
 import { Office } from './office';
 import { OrderDay } from './order-of-the-day';
+import { User } from './user';
 
 export type SessionTypes = 'ORDINARY';
 export type SessionStatus =
@@ -24,6 +25,8 @@ export interface SessionProps {
   attachments: Attachment[];
   createdAt: Date;
   updatedAt?: Date;
+  absentCouncilors?: User[];
+  presentCouncilors?: User[];
 
   cityCouncilId: string;
   officeId?: string;
@@ -99,6 +102,22 @@ export class Session {
 
   set closingDateTime(closingDateTime: Date) {
     this.props.closingDateTime = closingDateTime;
+  }
+
+  get absentCouncilors() {
+    return this.props.absentCouncilors;
+  }
+
+  set absentCouncilors(absentCouncilors: User[]) {
+    this.props.absentCouncilors = absentCouncilors;
+  }
+
+  get presentCouncilors() {
+    return this.props.presentCouncilors;
+  }
+
+  set presentCouncilors(presentCouncilors: User[]) {
+    this.props.presentCouncilors = presentCouncilors;
   }
 
   get sessionStatus() {

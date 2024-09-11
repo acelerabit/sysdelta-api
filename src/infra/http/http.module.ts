@@ -71,6 +71,7 @@ import { LegislativeMatterController } from './controllers/legislative-matter/le
 import { GetLegislativeMatter } from '@/application/use-cases/legislative-matter/get-legislative-matter';
 import { GetOfficeBySession } from '@/application/use-cases/office/get-office-by-session';
 import { GetOrderDayBySession } from '@/application/use-cases/order-of-the-day/get-order-day-by-session';
+import { FetchDisassociatedLegislativeMatters } from '@/application/use-cases/legislative-matter/fetch-disassociated-legislative-matters';
 
 @Module({
   controllers: [
@@ -144,6 +145,7 @@ import { GetOrderDayBySession } from '@/application/use-cases/order-of-the-day/g
     UpdateLegislativeMatter,
     DeleteLegislativeMatter,
     GetLegislativeMatter,
+    FetchDisassociatedLegislativeMatters,
   ],
   imports: [DatabaseModule, EmailModule, CryptographyModule, SchedulesModule],
 })

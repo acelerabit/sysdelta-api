@@ -17,6 +17,7 @@ import {
 import { LegislativeMattersPresenters } from './presenters/legislative-matter.presenter';
 import { UpdateLegislativeMatterBody } from './dtos/update-legislative-matter.dto';
 import { CreateLegislativeMatterBody } from './dtos/create-legislative-matter.dto';
+import { FetchDisassociatedLegislativeMatters } from '@/application/use-cases/legislative-matter/fetch-disassociated-legislative-matters';
 
 @Controller('legislative-matter')
 export class LegislativeMatterController {
@@ -27,6 +28,7 @@ export class LegislativeMatterController {
     private getLegislativeMatter: GetLegislativeMatter,
     private deleteLegislativeMatter: DeleteLegislativeMatter,
     private updateLegislativeMatter: UpdateLegislativeMatter,
+    private fetchDisassociatedLegislativeMatters: FetchDisassociatedLegislativeMatters,
   ) {}
 
   @Post('/:sessionId/office/:officeId')
@@ -61,6 +63,20 @@ export class LegislativeMatterController {
     return;
   }
 
+  @Post('/to-city-council/:cityCouncilId')
+  async createInCityCouncil(
+    @Param('cityCouncilId') cityCouncilId: string,
+
+    @Body() body: CreateLegislativeMatterBody,
+  ) {
+    await this.createLegislativeMatter.execute({
+      ...body,
+      cityCouncilId,
+    });
+
+    return;
+  }
+
   @Get('/:id')
   async get(@Param('id') id: string) {
     const { legislativeMatter } = await this.getLegislativeMatter.execute({
@@ -70,13 +86,15 @@ export class LegislativeMatterController {
     return LegislativeMattersPresenters.toHTTP(legislativeMatter);
   }
 
-  @Get('/')
+  @Get('/fetch/:cityCouncilId')
   async fetchPaginated(
+    @Param('cityCouncilId') cityCouncilId: string,
     @Query() query: { page?: string; itemsPerPage?: string },
   ) {
     const { page, itemsPerPage } = query;
 
     const { legislativeMatters } = await this.fetchLegislativeMatter.execute({
+      cityCouncilId,
       pagination: {
         itemsPerPage: Number(itemsPerPage),
         page: Number(page),

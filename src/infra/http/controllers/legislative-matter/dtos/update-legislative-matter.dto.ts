@@ -16,7 +16,7 @@ export class UpdateLegislativeMatterBody {
 
   @IsNotEmpty()
   @IsOptional()
-  code: number;
+  code: string;
 
   @IsNotEmpty()
   @IsOptional()
@@ -32,5 +32,5 @@ export class UpdateLegislativeMatterBody {
 
   @IsNotEmpty()
   @IsOptional()
-  authorId: string;
+  authors: string;
 }

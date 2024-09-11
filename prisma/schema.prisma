@@ -35,6 +35,8 @@ model CityCouncil {
   updatedAt DateTime  @updatedAt
   sessions  Session[]
 
+  legislativeMatters LegislativeMatter[]
+
   @@map("city_council")
 }
 
@@ -67,6 +69,12 @@ model User {
   legislativeMatterId String?
 
   legislativeMatters LegislativeMatter[]
+
+  sessionAbsent   Session? @relation("absent_councilors", fields: [sessionAbsentId], references: [id])
+  sessionAbsentId String?
+
+  sessionPresent   Session? @relation("present_councilors", fields: [sessionPresentId], references: [id])
+  sessionPresentId String?
 
   @@index([email])
   @@map("users")
@@ -115,6 +123,9 @@ model Session {
 
   cityCouncil   CityCouncil @relation(fields: [cityCouncilId], references: [id])
   cityCouncilId String
+
+  absentCouncilors  User[] @relation("absent_councilors")
+  presentCouncilors User[] @relation("present_councilors")
 }
 
 model OrderDay {
@@ -164,9 +175,9 @@ model LegislativeMatter {
   type             String
   summary          String
   presentationDate DateTime
-  code             Int
+  code             String
   title            String
-  votingType       VotingType
+  votingType       VotingType?
   status           LegislativeMatterStatus
 
   createdAt DateTime @map("created_at")
@@ -178,13 +189,18 @@ model LegislativeMatter {
   orderDay   OrderDay? @relation(fields: [orderDayId], references: [id])
   orderDayId String?
 
-  session   Session @relation(fields: [sessionId], references: [id])
-  sessionId String
+  session   Session? @relation(fields: [sessionId], references: [id])
+  sessionId String?
 
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String?
+
+  authors String?
 
   councilorsWhoVoted User[] @relation("councilors_who_voted")
+
+  cityCouncil   CityCouncil? @relation(fields: [cityCouncilId], references: [id])
+  cityCouncilId String?
 }
 
 model Notification {

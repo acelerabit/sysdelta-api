@@ -18,15 +18,19 @@ export interface LegislativeMatterProps {
   type: string;
   summary: string;
   presentationDate: Date;
-  code: number;
+  code: string;
   title: string;
-  votingType: VotingType;
+  votingType?: VotingType;
   status: Status;
   sessionId?: string;
-  authorId?: string;
   officeId?: string;
   orderDayId?: string;
+  cityCouncilId?: string;
+
+  authorId?: string;
   author?: User;
+
+  authors?: string;
   councilorsWhoVoted?: User[];
 }
 
@@ -79,6 +83,14 @@ export class LegislativeMatter {
     this.props.title = title;
   }
 
+  get authors() {
+    return this.props.authors;
+  }
+
+  set authors(authors: string) {
+    this.props.authors = authors;
+  }
+
   get presentationDate() {
     return this.props.presentationDate;
   }
@@ -91,7 +103,7 @@ export class LegislativeMatter {
     return this.props.code;
   }
 
-  set code(code: number) {
+  set code(code: string) {
     this.props.code = code;
   }
 
@@ -141,6 +153,14 @@ export class LegislativeMatter {
 
   get orderDayId() {
     return this.props.orderDayId;
+  }
+
+  set cityCouncilId(cityCouncilId: string) {
+    this.props.cityCouncilId = cityCouncilId;
+  }
+
+  get cityCouncilId() {
+    return this.props.cityCouncilId;
   }
 
   get councilorsWhoVoted() {

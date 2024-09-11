@@ -10,13 +10,14 @@ interface RequestLegislativeMatterProps {
   type: string;
   summary: string;
   presentationDate: Date;
-  code: number;
+  code: string;
   title: string;
-  votingType: VotingType;
-  sessionId: string;
-  authorId: string;
+  votingType?: VotingType;
+  sessionId?: string;
+  authors: string;
   officeId?: string;
   orderDayId?: string;
+  cityCouncilId?: string;
 }
 
 interface ResponseLegislativeMatterProps {

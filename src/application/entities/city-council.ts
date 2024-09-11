@@ -1,3 +1,4 @@
+import { LegislativeMatter } from '@/application/entities/legislative-matter';
 import { randomUUID } from 'node:crypto';
 import { Replace } from './../../helpers/Replace';
 import { User } from './user';
@@ -11,6 +12,7 @@ export interface CityCouncilProps {
   councilMembers: User[];
   responsible?: User;
   createdAt: Date;
+  legislativeMatters?: LegislativeMatter[];
 }
 
 export class CityCouncil {
@@ -80,6 +82,14 @@ export class CityCouncil {
 
   public set active(active: boolean) {
     this.props.active = active;
+  }
+
+  public get legislativeMatters(): LegislativeMatter[] {
+    return this.props.legislativeMatters;
+  }
+
+  public set legislativeMatters(legislativeMatters: LegislativeMatter[]) {
+    this.props.legislativeMatters = legislativeMatters;
   }
 
   public get councilMembers(): User[] {

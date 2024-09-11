@@ -3,10 +3,18 @@ import { LegislativeMatter } from '../entities/legislative-matter';
 
 export abstract class LegislativeMattersRepository {
   abstract create(legislativeMatter: LegislativeMatter): Promise<void>;
-  abstract findAll(pagination: PaginationParams): Promise<LegislativeMatter[]>;
+  abstract findAllDisassociated(
+    cityCouncilId: string,
+    pagination: PaginationParams,
+  ): Promise<LegislativeMatter[]>;
+
+  abstract findAll(
+    cityCouncilId: string,
+    pagination: PaginationParams,
+  ): Promise<LegislativeMatter[]>;
   abstract findAllWithoutPaginate(): Promise<LegislativeMatter[]>;
   abstract count(): Promise<number>;
-  abstract findByCode(code: number): Promise<LegislativeMatter | null>;
+  abstract findByCode(code: string): Promise<LegislativeMatter | null>;
   abstract fetchBySessionId(
     sessionId: string,
     pagination: PaginationParams,

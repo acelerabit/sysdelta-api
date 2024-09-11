@@ -21,9 +21,56 @@ export class PrismaLegislativeMattersRepository
     return;
   }
 
-  async findAll(pagination: PaginationParams): Promise<LegislativeMatter[]> {
+  async findAll(
+    cityCouncilId,
+    pagination: PaginationParams,
+  ): Promise<LegislativeMatter[]> {
+    const cityCouncil = await this.prismaService.cityCouncil.findUnique({
+      where: {
+        id: cityCouncilId,
+      },
+      include: {
+        sessions: true,
+      },
+    });
+
+    if (!cityCouncil) {
+      return null;
+    }
+
     const legislativeMatters =
       await this.prismaService.legislativeMatter.findMany({
+        where: {
+          OR: [
+            {
+              cityCouncilId,
+            },
+            {
+              sessionId: {
+                in: cityCouncil.sessions.map((session) => session.id),
+              },
+            },
+          ],
+        },
+        take: pagination.itemsPerPage,
+        skip: (pagination.page - 1) * pagination.itemsPerPage,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+    return legislativeMatters.map(PrismaLegislativeMattersMapper.toDomain);
+  }
+
+  async findAllDisassociated(
+    cityCouncilId: string,
+    pagination: PaginationParams,
+  ): Promise<LegislativeMatter[]> {
+    const legislativeMatters =
+      await this.prismaService.legislativeMatter.findMany({
+        where: {
+          cityCouncilId,
+        },
         take: pagination.itemsPerPage,
         skip: (pagination.page - 1) * pagination.itemsPerPage,
         orderBy: {
@@ -45,7 +92,7 @@ export class PrismaLegislativeMattersRepository
     return await this.prismaService.legislativeMatter.count();
   }
 
-  async findByCode(code: number): Promise<LegislativeMatter | null> {
+  async findByCode(code: string): Promise<LegislativeMatter | null> {
     const legislativeMatter =
       await this.prismaService.legislativeMatter.findFirst({
         where: {

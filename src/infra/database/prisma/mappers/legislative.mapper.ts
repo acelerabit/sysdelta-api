@@ -18,6 +18,8 @@ export class PrismaLegislativeMattersMapper {
         orderDayId: legislativeMatter.orderDayId,
         createdAt: legislativeMatter.createdAt,
         updatedAt: legislativeMatter.updatedAt,
+        authors: legislativeMatter.authors,
+        cityCouncilId: legislativeMatter.cityCouncilId,
       },
       legislativeMatter.id,
     );
@@ -41,6 +43,9 @@ export class PrismaLegislativeMattersMapper {
       updatedAt: legislativeMatter.updatedAt,
       officeId: legislativeMatter.officeId,
       orderDayId: legislativeMatter.orderDayId,
+      cityCouncilId: legislativeMatter.cityCouncilId,
+
+      authors: legislativeMatter.authors,
     };
   }
 }

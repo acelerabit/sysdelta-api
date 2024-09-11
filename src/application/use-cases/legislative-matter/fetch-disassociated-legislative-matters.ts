@@ -13,7 +13,7 @@ interface ResponseLegislativeMatterProps {
 }
 
 @Injectable()
-export class FetchLegislativeMatter {
+export class FetchDisassociatedLegislativeMatters {
   constructor(
     private legislativeMattersRepository: LegislativeMattersRepository,
   ) {}
@@ -23,10 +23,11 @@ export class FetchLegislativeMatter {
   ): Promise<ResponseLegislativeMatterProps> {
     const { pagination, cityCouncilId } = data;
 
-    const legislativeMatters = await this.legislativeMattersRepository.findAll(
-      cityCouncilId,
-      pagination,
-    );
+    const legislativeMatters =
+      await this.legislativeMattersRepository.findAllDisassociated(
+        cityCouncilId,
+        pagination,
+      );
 
     return { legislativeMatters };
   }
