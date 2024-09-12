@@ -5,7 +5,6 @@ export abstract class LegislativeMattersRepository {
   abstract create(legislativeMatter: LegislativeMatter): Promise<void>;
   abstract findAllDisassociated(
     cityCouncilId: string,
-    pagination: PaginationParams,
   ): Promise<LegislativeMatter[]>;
 
   abstract findAll(

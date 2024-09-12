@@ -64,15 +64,24 @@ export class PrismaLegislativeMattersRepository
 
   async findAllDisassociated(
     cityCouncilId: string,
-    pagination: PaginationParams,
   ): Promise<LegislativeMatter[]> {
     const legislativeMatters =
       await this.prismaService.legislativeMatter.findMany({
         where: {
-          cityCouncilId,
+          AND: [
+            {
+              cityCouncilId,
+            },
+            {
+              officeId: {
+                equals: null,
+              },
+              orderDayId: {
+                equals: null,
+              },
+            },
+          ],
         },
-        take: pagination.itemsPerPage,
-        skip: (pagination.page - 1) * pagination.itemsPerPage,
         orderBy: {
           createdAt: 'desc',
         },

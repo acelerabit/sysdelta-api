@@ -10,6 +10,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -18,6 +19,7 @@ import { LegislativeMattersPresenters } from './presenters/legislative-matter.pr
 import { UpdateLegislativeMatterBody } from './dtos/update-legislative-matter.dto';
 import { CreateLegislativeMatterBody } from './dtos/create-legislative-matter.dto';
 import { FetchDisassociatedLegislativeMatters } from '@/application/use-cases/legislative-matter/fetch-disassociated-legislative-matters';
+import { AssociateLegislativeMatter } from '@/application/use-cases/legislative-matter/associate-legislative-matter';
 
 @Controller('legislative-matter')
 export class LegislativeMatterController {
@@ -29,6 +31,7 @@ export class LegislativeMatterController {
     private deleteLegislativeMatter: DeleteLegislativeMatter,
     private updateLegislativeMatter: UpdateLegislativeMatter,
     private fetchDisassociatedLegislativeMatters: FetchDisassociatedLegislativeMatters,
+    private associateLegislativeMatter: AssociateLegislativeMatter,
   ) {}
 
   @Post('/:sessionId/office/:officeId')
@@ -104,6 +107,16 @@ export class LegislativeMatterController {
     return legislativeMatters.map(LegislativeMattersPresenters.toHTTP);
   }
 
+  @Get('/city-council/:cityCouncilId/disassociated-only')
+  async fetchDissociated(@Param('cityCouncilId') cityCouncilId: string) {
+    const { legislativeMatters } =
+      await this.fetchDisassociatedLegislativeMatters.execute({
+        cityCouncilId,
+      });
+
+    return legislativeMatters.map(LegislativeMattersPresenters.toHTTP);
+  }
+
   @Get('/from-session/:sessionId/office/:officeId')
   async fetch(
     @Param('sessionId') sessionId: string,
@@ -154,6 +167,25 @@ export class LegislativeMatterController {
     @Param('legislativeMatterId') legislativeMatterId: string,
   ) {
     await this.updateLegislativeMatter.execute({
+      ...body,
+      legislativeMatterId,
+    });
+
+    return;
+  }
+
+  @Patch('/associate/:legislativeMatterId')
+  async associate(
+    @Body()
+    body: {
+      sessionId: string;
+      phase: string;
+      officeId?: string;
+      orderDayId?: string;
+    },
+    @Param('legislativeMatterId') legislativeMatterId: string,
+  ) {
+    await this.associateLegislativeMatter.execute({
       ...body,
       legislativeMatterId,
     });

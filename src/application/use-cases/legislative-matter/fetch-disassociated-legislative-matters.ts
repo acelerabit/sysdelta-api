@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 
 interface RequestLegislativeMatterProps {
   cityCouncilId: string;
-  pagination: PaginationParams;
 }
 
 interface ResponseLegislativeMatterProps {
@@ -21,12 +20,11 @@ export class FetchDisassociatedLegislativeMatters {
   async execute(
     data: RequestLegislativeMatterProps,
   ): Promise<ResponseLegislativeMatterProps> {
-    const { pagination, cityCouncilId } = data;
+    const { cityCouncilId } = data;
 
     const legislativeMatters =
       await this.legislativeMattersRepository.findAllDisassociated(
         cityCouncilId,
-        pagination,
       );
 
     return { legislativeMatters };
